@@ -24,7 +24,7 @@ public class Produit
         int i=1;
         try {
             state = BDD.createStatement();
-            ResultSet result = state.executeQuery("SELECT id_art FROM article");
+            ResultSet result = state.executeQuery("SELECT id_art FROM articles");
 
             while(result.next())
             {			
@@ -49,8 +49,8 @@ public class Produit
         String[][] art=new String[this.quantite()-1][5];
         try {
             Statement state = BDD.createStatement();
-            ResultSet result = state.executeQuery("SELECT article.id_art,nom,prix,stock,nomCat" +
-            		" FROM article LEFT JOIN categorie ON article.idCategorie=categorie.id_cat WHERE stock > 0");
+            ResultSet result = state.executeQuery("SELECT articles.id_art,nom,prix,stock,nomCat" +
+            		" FROM articles LEFT JOIN categorie ON articles.idCategorie=categorie.id_cat WHERE stock > 0");
             ResultSetMetaData resultMeta = result.getMetaData();
             int j=0;
             while(result.next())
@@ -80,8 +80,8 @@ public class Produit
         String[][] art=new String[this.quantite()-1][5];
         try {
             Statement state = BDD.createStatement();
-            ResultSet result = state.executeQuery("SELECT article.id_art,nom,prix,stock,nomCat" +
-            		" FROM article LEFT JOIN categorie ON article.idCategorie=categorie.id_cat WHERE stock > 1 ORDER BY "+filtre+"");
+            ResultSet result = state.executeQuery("SELECT articles.id_art,nom,prix,stock,nomCat" +
+            		" FROM articles LEFT JOIN categorie ON articles.idCategorie=categorie.id_cat WHERE stock > 1 ORDER BY "+filtre+"");
             ResultSetMetaData resultMeta = result.getMetaData();
             int j=0;
             while(result.next())
@@ -118,7 +118,7 @@ public class Produit
     {
         try {
              
-            PreparedStatement requete = BDD.prepareStatement("insert into article (nom,description,prix,stock,idCategorie) values (?,?,?,?,?)");
+            PreparedStatement requete = BDD.prepareStatement("insert into articles (nom,description,prix,stock,idCategorie) values (?,?,?,?,?)");
             for(int i=1;i<=donnee.length;i++)
             {
             		requete.setObject(i, donnee[i-1]);
@@ -141,7 +141,7 @@ public class Produit
     {
     	 try {
     		 state = BDD.createStatement();
-             PreparedStatement requete = BDD.prepareStatement("UPDATE article SET stock = ? WHERE id_art = "+id+"");
+             PreparedStatement requete = BDD.prepareStatement("UPDATE articles SET stock = ? WHERE id_art = "+id+"");
              requete.setInt(1, valeur);
              requete.executeUpdate();
              requete.close();
@@ -160,7 +160,7 @@ public class Produit
     	int valeur=0;
     	try {
     		state = BDD.createStatement();
-    		ResultSet result = state.executeQuery("SELECT stock FROM article WHERE id_art = "+id+"");
+    		ResultSet result = state.executeQuery("SELECT stock FROM articles WHERE id_art = "+id+"");
     		
     		while(result.next())
             {		

@@ -18,13 +18,13 @@ public class Users
     }
     
     /**
-     * Fonction pour connaitre le nombre d'entrée dans une table
+     * Fonction pour connaitre le nombre d'entree dans une table
      * @param zone
      * @param id
      * @param option
      * @return ligne => le nombre de ligned d'une table
      */
-    public int quantité(String zone, String id,String option)
+    public int quantite(String zone, String id,String option)
     {
         int ligne=1;
         try {
@@ -49,7 +49,7 @@ public class Users
      */
     public String [][] ListUser()
     {
-        String[][] user=new String[this.quantité("users","id","WHERE actif=1")-1][this.getnombreCol()];
+        String[][] user=new String[this.quantite("users","id","WHERE actif=1")-1][this.getnombreCol()];
         try {
             state = BDD.createStatement();
             ResultSet result = state.executeQuery("SELECT * FROM users WHERE actif=1");
@@ -102,28 +102,28 @@ public class Users
      */
     public int getnombrelign()
     {
-        nombrelig=this.quantité("users","id","");
+        nombrelig=this.quantite("users","id","");
         return nombrelig;
     }
     
     /**
-     * Fonction qui ajoute des utlisateurs dans la base de données
-     * @param donnée
-     * @param donnéechif
+     * Fonction qui ajoute des utlisateurs dans la base de donnees
+     * @param donnee
+     * @param donneechif
      * @return true / false
      */
-    public boolean AjoutUser2(String donnée[],String donnéechif[])
+    public boolean AjoutUser2(String donnee[],String donneechif[])
     {
         try {
              
             PreparedStatement requete = BDD.prepareStatement("insert into users (mail,nom,prenom,adresse,pays,localite,telephone,actif) values (?,?,?,?,?,?,?,?)");
-            for(int i=1;i<=donnée.length;i++)
+            for(int i=1;i<=donnee.length;i++)
             {
-            		requete.setString(i, donnée[i-1]);
+            		requete.setString(i, donnee[i-1]);
             }
-            for(int i=1;i<=donnéechif.length;i++)
+            for(int i=1;i<=donneechif.length;i++)
             {
-            		requete.setString(i+donnée.length, donnéechif[i-1]);
+            		requete.setString(i+donnee.length, donneechif[i-1]);
             }
             
             requete.setString(8, "1");

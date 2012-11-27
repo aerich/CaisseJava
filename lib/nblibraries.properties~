@@ -1,0 +1,4 @@
+libs.Itext.classpath=\
+    ${base}/../itext-5.3.4/itextpdf-5.3.4.jar
+libs.Itext.javadoc=\
+    ${base}/../itext-5.3.4/itextpdf-5.3.4-javadoc.jar!//

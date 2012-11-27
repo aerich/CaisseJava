@@ -19,7 +19,7 @@ public class Produit
      * Fonction permettant de connaitrre le nombre de ligne dans une BDD
      * @return i
      */
-    public int quantité()
+    public int quantite()
     {
         int i=1;
         try {
@@ -46,11 +46,11 @@ public class Produit
      */
     public String [][] Article()
     {
-        String[][] art=new String[this.quantité()-1][5];
+        String[][] art=new String[this.quantite()-1][5];
         try {
             Statement state = BDD.createStatement();
             ResultSet result = state.executeQuery("SELECT article.id_art,nom,prix,stock,nomCat" +
-            		" FROM article LEFT JOIN catégorie ON article.idCatégorie=catégorie.id_cat WHERE stock > 0");
+            		" FROM article LEFT JOIN categorie ON article.idCategorie=categorie.id_cat WHERE stock > 0");
             ResultSetMetaData resultMeta = result.getMetaData();
             int j=0;
             while(result.next())
@@ -73,15 +73,15 @@ public class Produit
     /**
      * Fonction qui retourne les articles en filtrant la sortie
      * @param filtre
-     * @return art=> tout les article dans un ordre demandé
+     * @return art=> tout les article dans un ordre demande
      */
     public String [][] Article(String filtre)
     {
-        String[][] art=new String[this.quantité()-1][5];
+        String[][] art=new String[this.quantite()-1][5];
         try {
             Statement state = BDD.createStatement();
             ResultSet result = state.executeQuery("SELECT article.id_art,nom,prix,stock,nomCat" +
-            		" FROM article LEFT JOIN catégorie ON article.idCatégorie=catégorie.id_cat WHERE stock > 1 ORDER BY "+filtre+"");
+            		" FROM article LEFT JOIN categorie ON article.idCategorie=categorie.id_cat WHERE stock > 1 ORDER BY "+filtre+"");
             ResultSetMetaData resultMeta = result.getMetaData();
             int j=0;
             while(result.next())
@@ -102,26 +102,26 @@ public class Produit
         return art;
     }
     
-    //teste de vérification
-    public void vérification(Object tabproduit,Object produitSelect)
+    //teste de verification
+    public void verification(Object tabproduit,Object produitSelect)
     {
     	
     }
     
     
     /**
-     * Fonction qui ajoute un produit dans la base de données
-     * @param donnée
+     * Fonction qui ajoute un produit dans la base de donnees
+     * @param donnee
      * @return true/false
      */
-    public boolean AjoutProduit(Object donnée[])
+    public boolean AjoutProduit(Object donnee[])
     {
         try {
              
-            PreparedStatement requete = BDD.prepareStatement("insert into article (nom,description,prix,stock,idCatégorie) values (?,?,?,?,?)");
-            for(int i=1;i<=donnée.length;i++)
+            PreparedStatement requete = BDD.prepareStatement("insert into article (nom,description,prix,stock,idCategorie) values (?,?,?,?,?)");
+            for(int i=1;i<=donnee.length;i++)
             {
-            		requete.setObject(i, donnée[i-1]);
+            		requete.setObject(i, donnee[i-1]);
             }
              requete.executeUpdate();
              requete.close();
@@ -133,7 +133,7 @@ public class Produit
             }
     }
     /**
-     * Fonction qui met à jour le stock d'un aticle
+     * Fonction qui met e jour le stock d'un aticle
      * @param id
      * @param valeur
      */

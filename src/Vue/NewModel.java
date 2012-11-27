@@ -5,7 +5,7 @@ import javax.swing.table.AbstractTableModel;
 
 
 /**
- * Nouveau modèle de la jtable
+ * Nouveau modele de la jtable
  * Code repis du site du zero (les vraies tableaux)
  * @author Wes
  *
@@ -37,7 +37,7 @@ public class NewModel extends AbstractTableModel
 	}
 	
 	/**
-	 * Retourne la valeur à l'emplacement spécifié
+	 * Retourne la valeur e l'emplacement specifie
 	 */
 	public Object getValueAt(int row, int col)
 	{
@@ -51,7 +51,7 @@ public class NewModel extends AbstractTableModel
 	}
 	/********************************************************/
 	/**
-	* Retourne le titre de la colonne à l'indice spécifé
+	* Retourne le titre de la colonne e l'indice specife
 	*/
 	public String getColumnName(int col)
 	{
@@ -59,20 +59,20 @@ public class NewModel extends AbstractTableModel
 	}
 	
 	/**
-	* Retourne la classe de la donnée de la colonne
+	* Retourne la classe de la donnee de la colonne
 	* @param col
 	*/
 	public Class getColumnClass(int col)
 	{
-		//On retourne le type de la cellule à la colonne demandée
-		//On se moque de la ligne puisque les données sur chaque ligne sont les mêmes
-		//On choisit donc la première ligne
+		//On retourne le type de la cellule e la colonne demandee
+		//On se moque de la ligne puisque les donnees sur chaque ligne sont les memes
+		//On choisit donc la premiere ligne
 		return this.data[0][col].getClass();
 	}
 	public boolean isCellEditable(int row, int col)
 	{
-		//On appelle la méthode getValueAt qui retourne la valeur d'une cellule
-		//Et on fait un traitement spécifique si c'est un JButton
+		//On appelle la methode getValueAt qui retourne la valeur d'une cellule
+		//Et on fait un traitement specifique si c'est un JButton
 		if(getValueAt(0, col) instanceof JButton)
 			return true;
 		return false; 
@@ -94,8 +94,8 @@ public class NewModel extends AbstractTableModel
 			
 		this.data[indice] = data;
 		temp = null;
-		//Cette méthode permet d'avertir le tableau que les données ont été modifiées
-		//Ce qui permet une mise à jours complète du tableau
+		//Cette methode permet d'avertir le tableau que les donnees ont ete modifiees
+		//Ce qui permet une mise e jours complete du tableau
 		this.fireTableDataChanged();
 	}
 	public void update(Object[] data)
@@ -108,7 +108,7 @@ public class NewModel extends AbstractTableModel
 		this.fireTableDataChanged();
 	}
 	/**
-	 * Méthode permettant de retirer une ligne du tableau
+	 * Methode permettant de retirer une ligne du tableau
 	 * @param position
 	 */
 	public void removeRow(int position){
@@ -125,8 +125,8 @@ public class NewModel extends AbstractTableModel
 		}
 		this.data = temp;
 		temp = null;
-		//Cette méthode permet d'avertir le tableau que les données ont été modifiées
-		//Ce qui permet une mise à jours complète du tableau
+		//Cette methode permet d'avertir le tableau que les donnees ont ete modifiees
+		//Ce qui permet une mise e jours complete du tableau
 		this.fireTableDataChanged();
 	}
 	

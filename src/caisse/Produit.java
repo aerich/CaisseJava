@@ -24,7 +24,7 @@ public class Produit
         int i=1;
         try {
             state = BDD.createStatement();
-            ResultSet result = state.executeQuery("SELECT id_art FROM articles");
+            ResultSet result = state.executeQuery("SELECT id_art FROM article");
 
             while(result.next())
             {			
@@ -49,8 +49,8 @@ public class Produit
         String[][] art=new String[this.quantite()-1][5];
         try {
             Statement state = BDD.createStatement();
-            ResultSet result = state.executeQuery("SELECT articles.id_art,nom,prix,stock,nomCat" +
-            		" FROM articles LEFT JOIN categorie ON articles.idCategorie=categorie.id_cat WHERE stock > 0");
+            ResultSet result = state.executeQuery("SELECT article.id_art,nom,prix,stock,nomCat" +
+            		" FROM article LEFT JOIN categorie ON article.idCategorie=categorie.id_cat WHERE stock > 0");
             ResultSetMetaData resultMeta = result.getMetaData();
             int j=0;
             while(result.next())
@@ -80,8 +80,8 @@ public class Produit
         String[][] art=new String[this.quantite()-1][5];
         try {
             Statement state = BDD.createStatement();
-            ResultSet result = state.executeQuery("SELECT articles.id_art,nom,prix,stock,nomCat" +
-            		" FROM articles LEFT JOIN categorie ON articles.idCategorie=categorie.id_cat WHERE stock > 1 ORDER BY "+filtre+"");
+            ResultSet result = state.executeQuery("SELECT article.id_art,nom,prix,stock,nomCat" +
+            		" FROM article LEFT JOIN categorie ON article.idCategorie=categorie.id_cat WHERE stock > 1 ORDER BY "+filtre+"");
             ResultSetMetaData resultMeta = result.getMetaData();
             int j=0;
             while(result.next())
@@ -160,7 +160,7 @@ public class Produit
     	int valeur=0;
     	try {
     		state = BDD.createStatement();
-    		ResultSet result = state.executeQuery("SELECT stock FROM articles WHERE id_art = "+id+"");
+    		ResultSet result = state.executeQuery("SELECT stock FROM article WHERE id_art = "+id+"");
     		
     		while(result.next())
             {		

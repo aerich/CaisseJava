@@ -6,7 +6,7 @@ import javax.swing.table.AbstractTableModel;
 
 /**
  * Nouveau modele de la jtable
- * Code repis du site du zero (les vraies tableaux)
+ * Code repris du site du zero (les vraies tableaux)
  * @author Wes
  *
  */

@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 
 
 import caisse.*;
+import com.itextpdf.text.BaseColor;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
@@ -34,17 +35,42 @@ import javax.swing.text.DefaultFormatter;
 //import com.itextpdf.forms.layout.ColumnSpec;
 //import com.itextpdf.forms.layout.RowSpec;
 import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfFormXObject;
+import com.itextpdf.text.pdf.PdfObject;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import com.itextpdf.text.Anchor;
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chapter;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Jpeg;
+import com.itextpdf.text.List;
+import com.itextpdf.text.ListItem;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Section;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import com.itextpdf.text.pdf.Pfm2afm;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 import java.util.*;
+import java.awt.Toolkit; 
+import java.net.URL;
 
 public class Vue implements ActionListener
 {
@@ -69,8 +95,8 @@ public class Vue implements ActionListener
 	private String art[][];
 	private Object[][] data = new Object[0][0];
 	private NewModel model;
-	
-	private Fenetre fenPrinc,fenAjoutUt,fenlist;
+	private JFrame fenPrinc;
+	private Fenetre fenAjoutUt,fenlist;
 	private JPanel CPFenAjout,CPFenList;
 	private JTextField tfAjNom,tfAjPrenom,tfAjMail,tfAjCp,tfAjVille,tfAjPhone,quantstock;
 	private JLabel lblAjNom,lblAjPrenom,lblAjMail,lblAjAdresse,lblAjCp,lblAjVille,lblAjphone,lblValeurtotal;
@@ -93,19 +119,28 @@ public class Vue implements ActionListener
 	 */
 	public Vue()
 	{
-		fenPrinc=new Fenetre("Caisse enregistreuse",653,466);
-		
+                Dimension dimension = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+                
+                
+		fenPrinc=new JFrame("Caisse enregistreuse");
+                
+                fenPrinc.setSize(dimension);
+                fenPrinc.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                fenPrinc.setUndecorated(true);
+               
+                fenPrinc.setVisible(true);
+                
 		menuBar = new JMenuBar();
 		fenPrinc.setJMenuBar(menuBar);
 		
-		mnFichier = new JMenu("Fichier");
+		mnFichier = new JMenu("Action");
 		menuBar.add(mnFichier);
 		
 		mntmConnexion = new JMenuItem("Connexion");
 		
 		mnFichier.add(mntmConnexion);
 		
-		mntmDeconnexion = new JMenuItem("Deconnexion");
+		mntmDeconnexion = new JMenuItem("D\u00E9connexion");
 		mntmDeconnexion.setEnabled(false);
 		mnFichier.add(mntmDeconnexion);
 		
@@ -128,10 +163,10 @@ public class Vue implements ActionListener
 		panelTop.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panelTop.setLayout(new BoxLayout(panelTop, BoxLayout.X_AXIS));
 		
-		lblConnexion = new JLabel("Etat de la Base de donn\u00E9e : ");
+		lblConnexion = new JLabel("État de la Base de donn\u00E9e : ");
 		panelTop.add(lblConnexion);
 		
-		ldlEtatCon = new JLabel("Non connecte");
+		ldlEtatCon = new JLabel("Non connecté");
 		ldlEtatCon.setBackground(Color.RED);
 		panelTop.add(ldlEtatCon);
 		
@@ -206,7 +241,7 @@ public class Vue implements ActionListener
 		
 		lnom = new JLabel("");
 		
-		lblPrenom = new JLabel("prenom :");
+		lblPrenom = new JLabel("prénom :");
 		lblPrenom.setEnabled(false);
 		 
 		lprenom = new JLabel("");
@@ -214,7 +249,7 @@ public class Vue implements ActionListener
 		btnOk = new JButton("OK");
 		btnOk.setEnabled(false);
 		
-		lblProduir = new JLabel("Produir :");
+		lblProduir = new JLabel("Produit :");
 		lblProduir.setEnabled(false);
 		
 		comboBox_1 = new JComboBox();
@@ -279,7 +314,7 @@ public class Vue implements ActionListener
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				.addGroup(gl_pClient.createSequentialGroup()
 					.addContainerGap(318, Short.MAX_VALUE)
-					.addComponent(btnValider, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE)
+					.addComponent(btnValider)
 					.addGap(72))
 				.addGroup(Alignment.TRAILING, gl_pClient.createSequentialGroup()
 					.addContainerGap(279, Short.MAX_VALUE)
@@ -319,7 +354,7 @@ public class Vue implements ActionListener
 						.addGroup(gl_pClient.createSequentialGroup()
 							.addComponent(lblValeurtotal)
 							.addGap(32)
-							.addComponent(btnValider, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
+							.addComponent(btnValider))
 						.addComponent(lblTotal))
 					.addContainerGap(28, Short.MAX_VALUE))
 		);
@@ -328,7 +363,7 @@ public class Vue implements ActionListener
 		 * Ici je cree le Jtable, qui contiendra les articles choisi par un client
 		 */
 		//titre du Tableau
-		String  title[] = {"supprimer","id","Nom ", "Prix", "Quantite","total/euro"};
+		String  title[] = {"Supprimer","id","Nom ", "Prix", "Quantité","total/euro"};
 		//instancie un nouveau modele
 		model=new NewModel(data,title);
 		//instancie la table avec les donnees et les titres
@@ -389,10 +424,13 @@ public class Vue implements ActionListener
 	public void initAjoutProduit()
 	{
 		
-		fenAjoutProduit=new Fenetre("Admin produit",620,300);
+		fenAjoutProduit=new Fenetre("Admin produit",620,300,fenPrinc,true);
+                
 		CPFajoutProd = new JPanel();
 		CPFajoutProd.setBorder(new EmptyBorder(5, 5, 5, 5));
 		fenAjoutProduit.setContentPane(CPFajoutProd);
+                
+                
 		
 		lblCatgorie = new JLabel("Cat\u00E9gorie :");
 		
@@ -405,12 +443,12 @@ public class Vue implements ActionListener
 		CBCateg.addItem("lingerie de mariage");
 		
 		
-		lblNomDeLartique = new JLabel("Nom de l'artique:");
+		lblNomDeLartique = new JLabel("Nom de l'article:");
 		
 		tfNomArt = new JTextField();
 		tfNomArt.setColumns(10);
 		
-		lblPrixDeLartique = new JLabel("Prix de L'artique :");
+		lblPrixDeLartique = new JLabel("Prix de l'article :");
 		
 		tfPrixArt = new JTextField();
 		tfPrixArt.setColumns(10);
@@ -525,6 +563,7 @@ public class Vue implements ActionListener
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		CPFajoutProd.setLayout(gl_CPFajoutProd);
+                fenAjoutProduit.setVisible(true);
 	}
 
 	
@@ -659,6 +698,7 @@ public class Vue implements ActionListener
 		);
 		CPFenAjout.setLayout(GL_CPFenAjout);
 		fenAjoutUt.setContentPane(CPFenAjout);
+                fenAjoutUt.setVisible(true);
 	}
 	float totalFacture=0;
 	int quantProduit=0;
@@ -667,7 +707,7 @@ public class Vue implements ActionListener
 	private JMenuItem mntmQuitter;
 	private JMenu mnPrfrence;
 	private JMenuItem mntmConfig;
-	private JButton supp=new JButton("supprimer la derniere ligne");
+	private JButton supp=new JButton("supprimer la dernière ligne");
 	
 	/**
 	 * La fonction addligne permet quand l'utilisateur valide un article
@@ -863,16 +903,16 @@ public class Vue implements ActionListener
 					{
 						user=tabuser.ListUser();
 						comboBox.removeAllItems();
-						JOptionPane.showMessageDialog(fenAjoutUt, "Le client a bien ete inscrit","inscription",JOptionPane.PLAIN_MESSAGE);
+						JOptionPane.showMessageDialog(fenAjoutUt, "Le client a bien été inscrit","inscription",JOptionPane.PLAIN_MESSAGE);
 						fenAjoutUt.dispose();
 						AjoutComboboxtest(user,2,comboBox);
 					}else
 					{
-						JOptionPane.showMessageDialog(fenAjoutUt, "Le client n'a pas pu etre inscrit","Erreur",JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(fenAjoutUt, "Le client n'a pas pu être inscrit","Erreur",JOptionPane.ERROR_MESSAGE);
 					}
 				}else
 					{
-						JOptionPane.showMessageDialog(fenAjoutUt, "Tout les champs ne sont pas remplis correctement","Erreur",JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(fenAjoutUt, "Tous les champs ne sont pas remplis correctement","Erreur",JOptionPane.ERROR_MESSAGE);
 					}
 	}
 	/**
@@ -887,7 +927,7 @@ public class Vue implements ActionListener
 			lblTotal.setEnabled(true);
 			boolean exist=false;
 			int i=0;
-			//on verifie si l'article n'est pas dejas present dans la jtable
+			//on verifie si l'article n'est pas dejàs présent dans la jtable
 			while(i<table.getRowCount())
 			{
 				if(comboBox_1.getSelectedItem().toString()==table.getValueAt(i, 2))
@@ -972,7 +1012,7 @@ public class Vue implements ActionListener
 			//quant on clique sur le bouton ajout utilisateur
 		if(e.getSource()==btnAjoutUt)
 		{
-			fenAjoutUt=new Fenetre("Ajout utilisateur",461,339);
+			fenAjoutUt=new Fenetre("Ajout utilisateur",461,339,fenPrinc,true);
 			initfenAjoutUt();
 		}else
 		if(e.getSource()==btnAjAnnuler)
@@ -1018,7 +1058,7 @@ public class Vue implements ActionListener
 		if(e.getSource()==btnListeProduit)
 		{
 			
-			fenlist=new Fenetre("Listing produit",600,600);
+			fenlist=new Fenetre("Listing produit",600,600,fenPrinc,true);
 			CPFenList = new JPanel();
 			CPFenList.setLayout(new BorderLayout(0,0));
 			final JTextField quantstock = new JTextField();
@@ -1058,12 +1098,14 @@ public class Vue implements ActionListener
 			CPFenList.add(top,BorderLayout.NORTH);
 			CPFenList.add(scrollPane2,BorderLayout.CENTER);
 			fenlist.setContentPane(CPFenList);
+                        fenlist.setVisible(true);
 			
 			
 		}else
 			//quand on valide l'achat on peut avoir un petit appercu 
 		if(e.getSource()==btnValider)
 		{//fonction appercu d'achat
+                    System.out.println("Facture Demandée!");
 			crfact();
 		  	
 		}else
@@ -1073,7 +1115,7 @@ public class Vue implements ActionListener
 			//si l'ajout est reussit
 			if(nouv.ajoutFacture(Integer.parseInt(userSelect[0]), totalFacture))
 			{
-				JOptionPane.showMessageDialog(fenAjoutUt, "La facture "+(nouv.getlastfact()+1)+" a bien ete confirmer....patienter pour l'impression","Facture",JOptionPane.PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(fenAjoutUt, "La facture "+(nouv.getlastfact()+1)+" a bien été confirmée....patienter pour l'impression","Facture",JOptionPane.PLAIN_MESSAGE);
 				//pour chaque article dans la jtable, on met e jour son stock
 				for(int i=0;i<table.getRowCount();i++)
 				{
@@ -1101,7 +1143,10 @@ public class Vue implements ActionListener
 			//quand on supprime une ligne
 			if(e.getSource()==supp)
 			{
+                            if(table.getRowCount()>0)
+                            {
 				this.enlevelgne(table.getRowCount()-1);
+                            }
 			}
 			
 	}
@@ -1116,7 +1161,7 @@ public class Vue implements ActionListener
 	 */
 	public void crfact()
 	{
-		testfen = new Fenetre("test",500,500);
+		testfen = new Fenetre("test",500,500,fenPrinc,true);
 		JPanel testpan=new JPanel();
 		testfen.setContentPane(testpan);
 		testpane = new JTextPane();
@@ -1151,40 +1196,129 @@ public class Vue implements ActionListener
 				"\n\n\nAchat\n" +
 				""+facttable+
 				"\n\t\t Total : "+total+" euro");
-		
+		testfen.setVisible(true);
 	}
 	/**
 	 * Imprime la facture
 	 */
 	private void print() 
 	{
-		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("DD_MM_yyy_HH-mm-ss");
+            Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+            Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL, BaseColor.RED);
+            Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
+            Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
+            
+            
+            
+            
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("DD_MM_yyy_HH-mm-ss");
 	    String date = sdf.format(new Date());
+            
 	    Document document = new Document(PageSize.A4.rotate());
+            
 	    try 
 	    {
+             String nom_Fichier="Facture de "+userSelect[2]+" "+userSelect[3]+"du "+date;
+                
 	      PdfWriter writer = PdfWriter.getInstance(document,
-	      new FileOutputStream("Facture de "+userSelect[2]+" "+userSelect[3]+"du "+date+".pdf"));
+	      new FileOutputStream(nom_Fichier+".pdf"));
+              System.out.println(new File(".").getAbsolutePath());
+              System.out.println(System.getProperty("user.dir"));
+	      
+              
+              document.open();
+              document.addTitle(nom_Fichier);
+              document.addSubject("Facture en PDF via java et itext");
+              document.addKeywords("TR3SYC, IRT, Java, PDF, iText");
+              document.addAuthor(userSelect[2]+" "+userSelect[3]);
+              document.addCreator(userSelect[2]+" "+userSelect[3]);
+              
+              Paragraph preface = new Paragraph();
+              // We add one empty line
+              addEmptyLine(preface, 1);
+              // Lets write a big header
+              Paragraph num_Facture = new Paragraph("Numéro de la facture : "+numfact, catFont);
+              num_Facture.setAlignment(Paragraph.ALIGN_RIGHT);
+              preface.add(num_Facture);
+              
+              Paragraph str_Date = new Paragraph("Date: "+ date, smallBold);
+              str_Date.setAlignment(Paragraph.ALIGN_RIGHT);
+              preface.add(str_Date);
+                           
+              addEmptyLine(preface, 1);
+    
+              document.add(preface);
+              
+              PdfPTable tableau = new PdfPTable(5);
 
-	      document.open();
-	      PdfContentByte cb = writer.getDirectContent();
+    // t.setBorderColor(BaseColor.GRAY);
+    // t.setPadding(4);
+    // t.setSpacing(4);
+    // t.setBorderWidth(1);
+
+                PdfPCell c1 = new PdfPCell(new Phrase("Numéro d'article",smallBold));
+                c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tableau.addCell(c1);
+
+    c1 = new PdfPCell(new Phrase("Libelle",smallBold));
+    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+    tableau.addCell(c1);
+
+    c1 = new PdfPCell(new Phrase("Quantité",smallBold));
+    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+    tableau.addCell(c1);
+    tableau.setHeaderRows(1);
+
+    c1 = new PdfPCell(new Phrase("Prix H.T.",smallBold));
+    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+    tableau.addCell(c1);
+    tableau.setHeaderRows(1);
+    
+     c1 = new PdfPCell(new Phrase("Total en €",smallBold));
+    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+    tableau.addCell(c1);
+    tableau.setHeaderRows(1);
+    
+    
+    for(int i=0;i<table.getRowCount();i++)
+		{
+			for(int j=1;j<table.getColumnCount();j++)
+			{
+                            
+                                tableau.addCell(table.getValueAt(i, j).toString());
+			}
+		}
+  
+    
+    
+    document.add(tableau);
+    
+    
+    
+    
+    
+              
+            
+              
+	      /*PdfContentByte cb = writer.getDirectContent();
 	      
 	      cb.saveState();
 	      Graphics2D g2 = cb.createGraphicsShapes(500, 500);
 
 	      Shape oldClip = g2.getClip();
 	      g2.clipRect(0, 0, 500, 500);
-	      document.add(new Paragraph("Voici la facture"));
-	      document.add(new Paragraph("Numero de la facture : "+numfact+"\n\nIdentite\n" +
+	      
+	      document.add(new Paragraph("\n\nIdentite\n" +
 					"Nom : "+userSelect[2]+"\tPrenom : "+userSelect[3]+
 					"\nmail : "+userSelect[1]+""));
+              
 	      //testpane.print();
 	      table.print(g2);
 	      g2.setClip(oldClip);
 
 	      g2.dispose();
 	      cb.restoreState();
-	      document.add(new Paragraph("Le montant total  est de "+total+" euro "));
+	      document.add(new Paragraph("Le montant total  est de "+total+" euro "));*/
 		  document.newPage();
 	      //////////////
 	      
@@ -1193,4 +1327,11 @@ public class Vue implements ActionListener
 	    }
 	    document.close();
 	  }
+        
+        
+         private static void addEmptyLine(Paragraph paragraph, int number) {
+    for (int i = 0; i < number; i++) {
+      paragraph.add(new Paragraph(" "));
+    }
+  }
 }

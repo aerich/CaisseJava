@@ -2,6 +2,7 @@ package Vue;
 
 import java.awt.*;
 
+import javax.swing.Box.Filler;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -74,19 +75,26 @@ import java.net.URL;
 
 public class Vue implements ActionListener
 {
-	private JPanel contentPane,panelTop,panel;
+	private JPanel panelTop,panel;
+        private JPanel pClient;
+        private JPanel CPFenAjout,CPFenList;
+        private JPanel CPFajoutProd;
+        
 	private JMenuBar menuBar;
 	private JMenu mnFichier;
 	private JMenuItem mntmConnexion,mntmDeconnexion;
-	private JLabel lblConnexion,ldlEtatCon,lnom,lprenom,lblNom_1,lblPrenom,lblProduir;
-	
+	private JLabel lblConnexion,ldlEtatCon,lnom,lprenom,lblNom_1,lblPrenom,lblProduit;
+	private JLabel lblNom;
 
 	private boolean connexion=false;
-	private GroupLayout gl_contentPane;
-	private JPanel pClient;
-	private JLabel lblNom;
+		
+	
 	private JComboBox comboBox,comboBox_1,CBBStock;
-	private JButton btnOk,btnOk_1,btnValider,btnAjoutUt,btnAjoutProduit,btValideTable;
+        private JComboBox CBCateg;
+        
+	private JButton btnOk,btnOk_1,btnValider,btnAjoutUt,btnAjoutProduit,btValideTable,btnListeProduit;
+        private JButton btnValiderAjProduit,btnAnnulerAjProduit,btnFermerListeProduit;
+        
 	private Users tabuser;
 	private Produit prod;
 	private Connexion BDD;
@@ -95,22 +103,25 @@ public class Vue implements ActionListener
 	private String art[][];
 	private Object[][] data = new Object[0][0];
 	private NewModel model;
+        
 	private JFrame fenPrinc;
-	private Fenetre fenAjoutUt,fenlist;
-	private JPanel CPFenAjout,CPFenList;
+	
+        private Fenetre fenAjoutUt,fenlist;
+	private Fenetre fenAjoutProduit;
+        
 	private JTextField tfAjNom,tfAjPrenom,tfAjMail,tfAjCp,tfAjVille,tfAjPhone,quantstock;
+        private JTextField tfNomArt,tfPrixArt,tfQuantArt;
+        
 	private JLabel lblAjNom,lblAjPrenom,lblAjMail,lblAjAdresse,lblAjCp,lblAjVille,lblAjphone,lblValeurtotal;
-	private JButton btnAjValider,btnAjAnnuler,btnListeProduit;
+        private JLabel lblCatgorie,lblNomDeLartique,lblPrixDeLartique,lblQuantit,lblDescription,lblTotal;
+        
 	private JTextPane tpAjAdresse;
+        private JTextPane textPane;
+        
 	private GroupLayout GL_CPFenAjout;
 	private JTable table;
 	private JScrollPane scrollPane;
-	private Fenetre fenAjoutProduit;
-	private JPanel CPFajoutProd;
-	private JLabel lblCatgorie,lblNomDeLartique,lblPrixDeLartique,lblQuantit,lblDescription,lblTotal;
-	private JComboBox CBCateg;
-	private JTextField tfNomArt,tfPrixArt,tfQuantArt;
-	private JTextPane textPane;
+	
 	private JSpinner spQuantAjoutart;
 	private int max;
 	
@@ -156,8 +167,6 @@ public class Vue implements ActionListener
 		mntmConnexion.addActionListener(this);
 		mntmQuitter.addActionListener(this);
 		
-		contentPane = new JPanel();
-		fenPrinc.setContentPane(contentPane);
 		
 		panelTop = new JPanel();
 		panelTop.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -170,198 +179,136 @@ public class Vue implements ActionListener
 		ldlEtatCon.setBackground(Color.RED);
 		panelTop.add(ldlEtatCon);
 		
-		this.initjpClient();
-		
+                // Jpanel avec le client
+		pClient = new JPanel();
+                pClient.setLayout(new BoxLayout(pClient, BoxLayout.X_AXIS));
+		pClient.setBorder(new LineBorder(new Color(0, 0, 0)));
+		lblNom = new JLabel("Nom :");
+		lblNom.setEnabled(false);
+                btnOk = new JButton("OK");
+		btnOk.setEnabled(false);
+                comboBox = new JComboBox();
+		comboBox.setEnabled(false);
+		pClient.add(lblNom);
+		pClient.add(comboBox);
+		pClient.add(btnOk);
+                
 		panel = new JPanel();
 		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
-		gl_contentPane = new GroupLayout(contentPane);
-		gl_contentPane.setHorizontalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
-					.addGroup(gl_contentPane.createSequentialGroup()
-						.addComponent(pClient, GroupLayout.PREFERRED_SIZE, 459, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(panel, 0, 0, Short.MAX_VALUE))
-					.addComponent(panelTop, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 637, GroupLayout.PREFERRED_SIZE))
-		);
-		gl_contentPane.setVerticalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(panelTop, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
-						.addComponent(pClient, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addContainerGap())
-		);
-		
+                //
+                JPanel panGauche=new JPanel();
+                GridBagLayout layoutGauche = new GridBagLayout();
+                GridBagConstraints c = new GridBagConstraints();
+                c.fill = GridBagConstraints.HORIZONTAL;
+                panGauche.setLayout(layoutGauche);
+                panGauche.setBorder(new EmptyBorder(10, 10, 10, 10)); 
+                
+                
+                JPanel panCentre = new JPanel();
+                panCentre.setBorder(new EmptyBorder(10, 10, 10, 10)); 
+                BoxLayout layoutCentre = new BoxLayout(panCentre, BoxLayout.Y_AXIS);
+                
+                panCentre.setLayout(layoutCentre);
+                panCentre.add(pClient);
+                
+                
+                //
+                
 		btnAjoutUt = new JButton("Ajout utilisateur");
+                btnAjoutUt.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnAjoutUt.setEnabled(false);
 		
 		btnAjoutProduit = new JButton("Ajout produit");
+                btnAjoutProduit.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnAjoutProduit.setEnabled(false);
 		
 		btnListeProduit = new JButton("liste produit");
+                btnListeProduit.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnListeProduit.setEnabled(false);
-		GroupLayout gl_panel = new GroupLayout(panel);
-		gl_panel.setHorizontalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup()
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(btnAjoutProduit, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(btnAjoutUt, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(btnListeProduit, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)))
-					.addContainerGap())
-		);
-		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(btnAjoutProduit, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addComponent(btnAjoutUt, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addComponent(btnListeProduit, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
-					.addGap(153))
-		);
-		panel.setLayout(gl_panel);
-		
-		comboBox = new JComboBox();
-		comboBox.setEnabled(false);
-		
+	
+                
+              
+                panGauche.add(Box.createVerticalGlue());
+                c.gridx = 0;
+                c.ipady = 10; // largeur suplémentaire
+                panGauche.add(btnAjoutProduit,c);
+                c.insets = new Insets(10,0,0,0);  //top padding
+                panGauche.add(new Box.Filler(new Dimension(0,10), new Dimension(0,10), new Dimension(0,10)));
+                panGauche.add(btnAjoutUt,c);
+                panGauche.add(new Box.Filler(new Dimension(0,10), new Dimension(0,10), new Dimension(0,10)));
+                panGauche.add(btnListeProduit,c);
+		panGauche.add(Box.createVerticalGlue());
+                //
+		// Panel de l'utilisateur en cours
+		JPanel panUtilisateur = new JPanel();
+                
+                panUtilisateur.setLayout(new FlowLayout(FlowLayout.LEFT));
 		lblNom_1 = new JLabel("nom :");
 		lblNom_1.setEnabled(false);
-		
+		panUtilisateur.add(lblNom_1);
+                
 		lnom = new JLabel("");
+                panUtilisateur.add(lnom);
 		
+                Filler espace = new Box.Filler(new Dimension(10, 0),new Dimension(10, 0),new Dimension(10, 0));
+                
+                panUtilisateur.add(espace);
+                
 		lblPrenom = new JLabel("prénom :");
 		lblPrenom.setEnabled(false);
+                panUtilisateur.add(lblPrenom);
 		 
 		lprenom = new JLabel("");
+		panUtilisateur.add(lprenom);
 		
-		btnOk = new JButton("OK");
-		btnOk.setEnabled(false);
-		
-		lblProduir = new JLabel("Produit :");
-		lblProduir.setEnabled(false);
+                panCentre.add(panUtilisateur);
+                
+		// Panel des articles à ajouter
+                JPanel panArticles = new JPanel();
+                panArticles.setLayout(new BoxLayout(panArticles, BoxLayout.X_AXIS));
+		lblProduit = new JLabel("Produit :");
+		lblProduit.setEnabled(false);
+                panArticles.add(lblProduit);
 		
 		comboBox_1 = new JComboBox();
 		comboBox_1.setEnabled(false);
-		
-		
+		panArticles.add(comboBox_1);
+                
+		CBBStock = new JComboBox();
+		CBBStock.setEnabled(false);
+		panArticles.add(CBBStock);
+                
 		btnOk_1 = new JButton("OK");
 		btnOk_1.setEnabled(false);
+		panArticles.add(btnOk_1);
+                                
+                panCentre.add(panArticles);
+                panCentre.add(new Box.Filler(new Dimension(0, 10),new Dimension(0, 10),new Dimension(0, 10)));
+                
+		// Total et prix
+                JPanel panTotal = new JPanel();
+                panTotal.setLayout(new FlowLayout(FlowLayout.CENTER));
+                
+		lblTotal = new JLabel("Total :");
+		lblTotal.setEnabled(false);
+		lblValeurtotal = new JLabel("");
+                panTotal.add(lblTotal);
+                panTotal.add(lblValeurtotal);
 		
-		
+                // Bouton valider en dessous
 		btnValider = new JButton("Valider");
 		btnValider.setEnabled(false);
 		btnValider.addActionListener(this);
 
-		
-		JPanel panel_1 = new JPanel();
-		
-		lblTotal = new JLabel("Total :");
-		lblTotal.setEnabled(false);
-		
-		lblValeurtotal = new JLabel("");
-		
-		CBBStock = new JComboBox();
-		CBBStock.setEnabled(false);
-		
-		GroupLayout gl_pClient = new GroupLayout(pClient);
-		gl_pClient.setHorizontalGroup(
-			gl_pClient.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pClient.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblProduir)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(comboBox_1, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
-					.addComponent(CBBStock, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addComponent(btnOk_1)
-					.addGap(101))
-				.addGroup(gl_pClient.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblNom)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_pClient.createParallelGroup(Alignment.LEADING, false)
-						.addGroup(gl_pClient.createSequentialGroup()
-							.addComponent(lblNom_1)
-							.addGap(18)
-							.addComponent(lnom)
-							.addGap(54)
-							.addComponent(lblPrenom)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lprenom, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED, 126, Short.MAX_VALUE)
-					.addComponent(btnOk)
-					.addGap(101))
-				.addGroup(gl_pClient.createSequentialGroup()
-					.addContainerGap(363, Short.MAX_VALUE)
-					.addComponent(lblValeurtotal)
-					.addGap(103))
-				.addGroup(gl_pClient.createSequentialGroup()
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 456, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-				.addGroup(gl_pClient.createSequentialGroup()
-					.addContainerGap(318, Short.MAX_VALUE)
-					.addComponent(btnValider)
-					.addGap(72))
-				.addGroup(Alignment.TRAILING, gl_pClient.createSequentialGroup()
-					.addContainerGap(279, Short.MAX_VALUE)
-					.addComponent(lblTotal)
-					.addGap(147))
-		);
-		gl_pClient.setVerticalGroup(
-			gl_pClient.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pClient.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_pClient.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNom)
-						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnOk))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_pClient.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_pClient.createSequentialGroup()
-							.addGroup(gl_pClient.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblPrenom)
-								.addComponent(lblNom_1))
-							.addGap(15))
-						.addGroup(gl_pClient.createSequentialGroup()
-							.addComponent(lprenom)
-							.addGap(24))
-						.addGroup(gl_pClient.createSequentialGroup()
-							.addComponent(lnom)
-							.addGap(26)))
-					.addGroup(gl_pClient.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblProduir)
-						.addComponent(comboBox_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnOk_1)
-						.addComponent(CBBStock, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(17)
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_pClient.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_pClient.createSequentialGroup()
-							.addComponent(lblValeurtotal)
-							.addGap(32)
-							.addComponent(btnValider))
-						.addComponent(lblTotal))
-					.addContainerGap(28, Short.MAX_VALUE))
-		);
-		
-		/**
+                /**
 		 * Ici je cree le Jtable, qui contiendra les articles choisi par un client
 		 */
+                
+		JPanel panel_1 = new JPanel();
+		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
+		
+		
 		//titre du Tableau
 		String  title[] = {"Supprimer","id","Nom ", "Prix", "Quantité","total/euro"};
 		//instancie un nouveau modele
@@ -373,14 +320,25 @@ public class Vue implements ActionListener
 		scrollPane = new JScrollPane(table);
 		scrollPane.setVisible(false);
 		//modifie la taille 
-		scrollPane.setPreferredSize(new Dimension(430, 120));
+		//scrollPane.setPreferredSize(new Dimension(430, 120));
 		panel_1.add(scrollPane);
 		supp.setVisible(false);
 		panel_1.add(supp);
 		supp.addActionListener(this);
-		pClient.setLayout(gl_pClient);
-		contentPane.setLayout(gl_contentPane);
-		
+                //
+		panCentre.add(panel_1);
+                panCentre.add(panTotal);
+                panCentre.add(btnValider);
+                panCentre.add(new Box.Filler(new Dimension(0,100), new Dimension(0,500), new Dimension(0,100)));
+		//
+                JPanel fond = new JPanel(new BorderLayout());
+                fond.add("North",panelTop);
+                fond.add("Center", panCentre);
+                fond.add(BorderLayout.EAST, panGauche);
+                
+                fenPrinc.setContentPane(fond);
+          
+                fenPrinc.doLayout();
 //////////////////////////////////////////////////////
 /////////////////////Action bouton / autre////////////
 //////////////////////////////////////////////////////
@@ -484,11 +442,11 @@ public class Vue implements ActionListener
 				fenAjoutProduit.dispose();
 			}
 		});
-		JButton btnAnnuler = new JButton("Annuler");
+		JButton btnAnnulerProduit = new JButton("Annuler");
 		/**
 		 * quand on clique sur annuler on quitte tout simplement la fenetre
 		 */
-		btnAnnuler.addActionListener(new ActionListener() 
+		btnAnnulerProduit.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -527,7 +485,7 @@ public class Vue implements ActionListener
 					.addContainerGap(321, Short.MAX_VALUE)
 					.addComponent(btnValider)
 					.addGap(18)
-					.addComponent(btnAnnuler)
+					.addComponent(btnAnnulerProduit)
 					.addGap(31))
 		);
 		gl_CPFajoutProd.setVerticalGroup(
@@ -559,7 +517,7 @@ public class Vue implements ActionListener
 					.addGap(18)
 					.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnValider)
-						.addComponent(btnAnnuler))
+						.addComponent(btnAnnulerProduit))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		CPFajoutProd.setLayout(gl_CPFajoutProd);
@@ -567,13 +525,6 @@ public class Vue implements ActionListener
 	}
 
 	
-	public void initjpClient()
-	{
-		pClient = new JPanel();
-		pClient.setBorder(new LineBorder(new Color(0, 0, 0)));
-		lblNom = new JLabel("Nom :");
-		lblNom.setEnabled(false);
-	}
 	/**
 	 * fonction qui cree la fenetre pour ajouter un utilisateur
 	 */
@@ -616,12 +567,14 @@ public class Vue implements ActionListener
 		tfAjPhone = new JTextField();
 		tfAjPhone.setColumns(10);
 		
-		btnAjValider = new JButton("Valider");
-		btnAjValider.addActionListener(this);
+		btnValiderAjProduit = new JButton("Valider");
+		btnValiderAjProduit.addActionListener(this);
 		
-		btnAjAnnuler = new JButton("Annuler");
-		btnAjAnnuler.addActionListener(this);
-		
+		btnAnnulerAjProduit = new JButton("Annuler");
+		btnAnnulerAjProduit.addActionListener(this);
+                
+               
+                
 		GL_CPFenAjout = new GroupLayout(CPFenAjout);
 		GL_CPFenAjout.setHorizontalGroup(
 				GL_CPFenAjout.createParallelGroup(Alignment.LEADING)
@@ -659,9 +612,9 @@ public class Vue implements ActionListener
 									.addComponent(tfAjPhone, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE))))
 						.addGroup(GL_CPFenAjout.createSequentialGroup()
 							.addGap(122)
-							.addComponent(btnAjValider)
+							.addComponent(btnValiderAjProduit)
 							.addGap(18)
-							.addComponent(btnAjAnnuler)))
+							.addComponent(btnAnnulerAjProduit)))
 					.addContainerGap(17, Short.MAX_VALUE))
 		);
 		GL_CPFenAjout.setVerticalGroup(
@@ -693,8 +646,8 @@ public class Vue implements ActionListener
 						.addComponent(tfAjPhone, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
 					.addGroup(GL_CPFenAjout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnAjValider)
-						.addComponent(btnAjAnnuler)))
+						.addComponent(btnValiderAjProduit)
+						.addComponent(btnAnnulerAjProduit)))
 		);
 		CPFenAjout.setLayout(GL_CPFenAjout);
 		fenAjoutUt.setContentPane(CPFenAjout);
@@ -950,7 +903,7 @@ public class Vue implements ActionListener
 			
 
 		}else
-		/*Quant on clique sur le bouton qui valide le nom du client selectionner dans la comboBox*/
+		/*Quant on clique sur le bouton qui valide le nom du client selectionné dans la comboBox*/
 		if(e.getSource()==btnOk)
 		{
 					/*On active les differents composants*/
@@ -962,7 +915,7 @@ public class Vue implements ActionListener
 			btnOk_1.setEnabled(true);
 			lblPrenom.setEnabled(true);
 			lblNom_1.setEnabled(true);
-			lblProduir.setEnabled(true);
+			lblProduit.setEnabled(true);
 			btnAjoutProduit.setEnabled(true);
 			btnAjoutUt.setEnabled(true);
 			supp.setVisible(true);
@@ -1015,12 +968,16 @@ public class Vue implements ActionListener
 			fenAjoutUt=new Fenetre("Ajout utilisateur",461,339,fenPrinc,true);
 			initfenAjoutUt();
 		}else
-		if(e.getSource()==btnAjAnnuler)
+		if(e.getSource()==btnAnnulerAjProduit)
 		{
 			fenAjoutUt.dispose();
 		}else
+                if(e.getSource()==btnFermerListeProduit)
+		{
+			fenlist.dispose();
+		}else
 			//quand on valide l'ajout d'un utilisateur
-		if(e.getSource()==btnAjValider)
+		if(e.getSource()==btnValiderAjProduit)
 		{
 			this.ajoutUtilisateur();
 			
@@ -1057,7 +1014,8 @@ public class Vue implements ActionListener
 			//Affiche l'inventaire des produit
 		if(e.getSource()==btnListeProduit)
 		{
-			
+			btnFermerListeProduit = new JButton("Fermer");
+                        btnFermerListeProduit.addActionListener(this);
 			fenlist=new Fenetre("Listing produit",600,600,fenPrinc,true);
 			CPFenList = new JPanel();
 			CPFenList.setLayout(new BorderLayout(0,0));
@@ -1068,14 +1026,15 @@ public class Vue implements ActionListener
 			//on cree un nouvel jtabl ou l'on va placer tout les produits
 			NewModel model2=new NewModel(listart,new String[]{"id","Nom","prix","stock","categorie"});
 			JTable table2 = new JTable(model2);
-			table2.setPreferredScrollableViewportSize(new Dimension(300, 150));
+		//	table2.setPreferredScrollableViewportSize(new Dimension(300, 150));
 			JScrollPane scrollPane2 = new JScrollPane(table2);
-			scrollPane2.setPreferredSize(new Dimension(300, 150));
-			JLabel texte = new JLabel("Augmenter la quantite :");
+			//scrollPane2.setPreferredSize(new Dimension(300, 150));
+			JLabel texte = new JLabel("Augmenter la quantité:");
 			JPanel top = new JPanel();
-			JButton btokstock = new JButton("ok"); 
-			//quand on valide la nouvelle quantite, on met la base e jour
-			btokstock.addActionListener(new ActionListener() 
+                        top.setLayout(new GridBagLayout());
+			JButton btnStockAjout = new JButton("Ok"); 
+			//Quand on valide la nouvelle quantité, on met la base à jour
+			btnStockAjout.addActionListener(new ActionListener() 
 			{
 				public void actionPerformed(ActionEvent e) 
 				{
@@ -1091,12 +1050,30 @@ public class Vue implements ActionListener
 					}
 				}
 			});
-			top.add(texte);
-			top.add(comboBox_1);
-			top.add(quantstock);
-			top.add(btokstock);
+                        
+                        GridBagConstraints contraintes = new GridBagConstraints();
+                        contraintes.fill = GridBagConstraints.HORIZONTAL;
+                        contraintes.gridx = 0;
+                        contraintes.gridy = 0;
+                        contraintes.weightx = 0.5;
+			top.add(texte,contraintes);
+			
+                        contraintes.gridx = 1;
+                        contraintes.gridy = 0;
+                        top.add(comboBox_1,contraintes);
+                        
+                        contraintes.gridx = 2;
+                        contraintes.gridy = 0;
+			top.add(quantstock,contraintes);
+                        
+                        contraintes.gridx = 0;
+                        contraintes.gridy = 1;
+                        contraintes.gridwidth = 3;
+			contraintes.weightx = 0.0;
+                        top.add(btnStockAjout,contraintes);
 			CPFenList.add(top,BorderLayout.NORTH);
 			CPFenList.add(scrollPane2,BorderLayout.CENTER);
+                        CPFenList.add(btnFermerListeProduit,BorderLayout.SOUTH);
 			fenlist.setContentPane(CPFenList);
                         fenlist.setVisible(true);
 			

@@ -1,8 +1,11 @@
 package Vue;
 
+import java.awt.Color;
 import java.awt.Frame;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 
 public class Fenetre extends JDialog
 {
@@ -16,6 +19,7 @@ public class Fenetre extends JDialog
 	    this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	    this.setUndecorated(true);
             this.setAlwaysOnTop(true);
+            this.getRootPane().setBorder(new LineBorder(Color.darkGray, 10));
             
             
 	}

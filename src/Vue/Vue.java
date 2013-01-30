@@ -72,6 +72,7 @@ import java.util.regex.Pattern;
 import java.util.*;
 import java.awt.Toolkit; 
 import java.net.URL;
+import javax.swing.plaf.SplitPaneUI;
 
 public class Vue implements ActionListener
 {
@@ -113,10 +114,10 @@ public class Vue implements ActionListener
         private JTextField tfNomArt,tfPrixArt,tfQuantArt;
         
 	private JLabel lblAjNom,lblAjPrenom,lblAjMail,lblAjAdresse,lblAjCp,lblAjVille,lblAjphone,lblValeurtotal;
-        private JLabel lblCatgorie,lblNomDeLartique,lblPrixDeLartique,lblQuantit,lblDescription,lblTotal;
+        private JLabel lblCatgorie,lblNomArticle,lblPrixArticle,lblQuantit,lblDescription,lblTotal;
         
 	private JTextPane tpAjAdresse;
-        private JTextPane textPane;
+        private JTextPane textPaneDescription;
         
 	private GroupLayout GL_CPFenAjout;
 	private JTable table;
@@ -401,12 +402,12 @@ public class Vue implements ActionListener
 		CBCateg.addItem("lingerie de mariage");
 		
 		
-		lblNomDeLartique = new JLabel("Nom de l'article:");
+		lblNomArticle = new JLabel("Nom de l'article:");
 		
 		tfNomArt = new JTextField();
 		tfNomArt.setColumns(10);
 		
-		lblPrixDeLartique = new JLabel("Prix de l'article :");
+		lblPrixArticle = new JLabel("Prix de l'article :");
 		
 		tfPrixArt = new JTextField();
 		tfPrixArt.setColumns(10);
@@ -419,7 +420,7 @@ public class Vue implements ActionListener
 		
 		lblDescription = new JLabel("Description");
 		
-		textPane = new JTextPane();
+		textPaneDescription = new JTextPane();
 		
 		
 		JButton btnValider = new JButton("Valider");
@@ -433,7 +434,7 @@ public class Vue implements ActionListener
 			public void actionPerformed(ActionEvent e) 
 			{
 				Object []tab={tfNomArt.getText().toString(),
-						textPane.getText().toString(),
+						textPaneDescription.getText().toString(),
 						tfPrixArt.getText().toString(),
 						tfQuantArt.getText().toString(),
 						CBCateg.getSelectedIndex()+""
@@ -453,74 +454,46 @@ public class Vue implements ActionListener
 				fenAjoutProduit.dispose();
 			}
 		});	
-	
-		GroupLayout gl_CPFajoutProd = new GroupLayout(CPFajoutProd);
-		gl_CPFajoutProd.setHorizontalGroup(
-			gl_CPFajoutProd.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_CPFajoutProd.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_CPFajoutProd.createSequentialGroup()
-							.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblNomDeLartique)
-								.addComponent(lblPrixDeLartique))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.LEADING)
-								.addComponent(tfNomArt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(tfPrixArt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-						.addGroup(gl_CPFajoutProd.createSequentialGroup()
-							.addComponent(lblQuantit)
-							.addGap(12)
-							.addComponent(tfQuantArt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_CPFajoutProd.createSequentialGroup()
-							.addComponent(lblCatgorie)
-							.addGap(12)
-							.addComponent(CBCateg, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)))
-					.addGap(84)
-					.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.LEADING)
-						.addComponent(lblDescription)
-						.addComponent(textPane, GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE))
-					.addContainerGap())
-				.addGroup(gl_CPFajoutProd.createSequentialGroup()
-					.addContainerGap(321, Short.MAX_VALUE)
-					.addComponent(btnValider)
-					.addGap(18)
-					.addComponent(btnAnnulerProduit)
-					.addGap(31))
-		);
-		gl_CPFajoutProd.setVerticalGroup(
-			gl_CPFajoutProd.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_CPFajoutProd.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.BASELINE)
-							.addComponent(lblCatgorie)
-							.addComponent(CBCateg, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_CPFajoutProd.createSequentialGroup()
-							.addComponent(lblDescription)
-							.addGap(18)))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_CPFajoutProd.createSequentialGroup()
-							.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblNomDeLartique)
-								.addComponent(tfNomArt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addGap(32)
-							.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblPrixDeLartique)
-								.addComponent(tfPrixArt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addGap(37)
-							.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblQuantit)
-								.addComponent(tfQuantArt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-						.addComponent(textPane, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_CPFajoutProd.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnValider)
-						.addComponent(btnAnnulerProduit))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		);
-		CPFajoutProd.setLayout(gl_CPFajoutProd);
+                // Mise en forme de la fenêtre Ajout produit            
+                JPanel panGaucheAJart = new JPanel();
+                GridLayout layoutGauche = new GridLayout();
+                layoutGauche.setColumns(2);
+                layoutGauche.setRows(5);
+                
+                Filler espace = new Box.Filler(new Dimension(50, 5),new Dimension(50, 5),new Dimension(50, 5));
+                Filler espace1 = new Box.Filler(new Dimension(50, 5),new Dimension(50, 5),new Dimension(50, 5));
+                espace.setBackground(Color.red);
+                espace1.setBackground(Color.red);
+                               
+                panGaucheAJart.setLayout(layoutGauche);
+                panGaucheAJart.add(lblCatgorie);
+                panGaucheAJart.add(CBCateg);
+                panGaucheAJart.add(espace);
+                panGaucheAJart.add(espace1);
+                panGaucheAJart.add(lblNomArticle);
+                panGaucheAJart.add(tfNomArt);
+                panGaucheAJart.add(lblPrixArticle);
+                panGaucheAJart.add(tfPrixArt);
+                panGaucheAJart.add(lblQuantit);
+                panGaucheAJart.add(tfQuantArt);
+                
+                
+                
+                JPanel panDroitAJart = new JPanel();
+                BoxLayout layoutDroit = new BoxLayout(panDroitAJart,BoxLayout.Y_AXIS);
+                panDroitAJart.setLayout(layoutDroit);
+                panDroitAJart.add(lblDescription);
+                panDroitAJart.add(textPaneDescription);
+                FlowLayout layoutbtn = new FlowLayout(FlowLayout.RIGHT);
+                JPanel panBtn = new JPanel();
+                panBtn.setLayout(layoutbtn);
+                panBtn.add(btnValider);
+                panBtn.add(btnAnnulerProduit);
+                panDroitAJart.add(panBtn);
+                
+                JSplitPane panAjoutarticles = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,panGaucheAJart,panDroitAJart);
+                
+                fenAjoutProduit.setContentPane(panAjoutarticles);
                 fenAjoutProduit.setVisible(true);
 	}
 

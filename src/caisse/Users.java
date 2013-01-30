@@ -47,7 +47,7 @@ public class Users
      * Fonction qui retourne tout les utilisateurs valide.
      * @return
      */
-    public String [][] ListUser()
+    public String [][] ListeUser()
     {
         String[][] user=new String[this.quantite("users","id","WHERE actif=1")-1][this.getnombreCol()];
         try {
@@ -116,7 +116,7 @@ public class Users
     {
         try {
              
-            PreparedStatement requete = BDD.prepareStatement("insert into users (mail,nom,prenom,adresse,pays,localite,telephone,actif) values (?,?,?,?,?,?,?,?)");
+            PreparedStatement requete = BDD.prepareStatement("insert into users (mail,nom,prenom,adresse,Ville,localite,telephone,actif) values (?,?,?,?,?,?,?,?)");
             for(int i=1;i<=donnee.length;i++)
             {
             		requete.setString(i, donnee[i-1]);

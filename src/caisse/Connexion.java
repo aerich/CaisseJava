@@ -1,6 +1,8 @@
 package caisse;
 import java.util.*;
 	import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Connexion 
 {
@@ -38,4 +40,18 @@ public class Connexion
 	    {
 	    	return Etat;
 	    }
+            
+            public boolean deconnecter()
+            {
+                boolean ok=true;
+                try {
+                        con.close();
+                        
+                 } catch (SQLException ex) {
+                         Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+                         ok=false;
+                 }
+                return ok;
+                
+            }
 }

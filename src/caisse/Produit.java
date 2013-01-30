@@ -44,7 +44,7 @@ public class Produit
      * Fonction qui retourne les articles
      * @return art
      */
-    public String [][] Article()
+    public String [][] listeArticle()
     {
         String[][] art=new String[this.quantite()-1][5];
         try {
@@ -118,7 +118,7 @@ public class Produit
     {
         try {
              
-            PreparedStatement requete = BDD.prepareStatement("insert into articles (nom,description,prix,stock,idCategorie) values (?,?,?,?,?)");
+            PreparedStatement requete = BDD.prepareStatement("insert into article (nom,description,prix,stock,idCategorie) values (?,?,?,?,?)");
             for(int i=1;i<=donnee.length;i++)
             {
             		requete.setObject(i, donnee[i-1]);
@@ -141,7 +141,7 @@ public class Produit
     {
     	 try {
     		 state = BDD.createStatement();
-             PreparedStatement requete = BDD.prepareStatement("UPDATE articles SET stock = ? WHERE id_art = "+id+"");
+             PreparedStatement requete = BDD.prepareStatement("UPDATE article SET stock = ? WHERE id_art = "+id+"");
              requete.setInt(1, valeur);
              requete.executeUpdate();
              requete.close();

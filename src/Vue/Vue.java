@@ -90,7 +90,7 @@ public class Vue implements ActionListener
 	private boolean connexion=false;
 		
 	
-	private JComboBox comboBox,comboBox_1,CBBStock;
+	private JComboBox comboBox,cmbArticlesFenPrinc,CBBStock;
         private JComboBox CBCateg;
         
 	private JButton btnOk,btnOk_1,btnValider,btnAjoutUt,btnAjoutProduit,btValideTable,btnListeProduit;
@@ -153,6 +153,7 @@ public class Vue implements ActionListener
 		mnFichier.add(mntmConnexion);
 		
 		mntmDeconnexion = new JMenuItem("D\u00E9connexion");
+                mntmDeconnexion.addActionListener(this);
 		mntmDeconnexion.setEnabled(false);
 		mnFichier.add(mntmDeconnexion);
 		
@@ -212,24 +213,20 @@ public class Vue implements ActionListener
                 
                 panCentre.setLayout(layoutCentre);
                 panCentre.add(pClient);
-                
-                
+                               
                 //
                 
 		btnAjoutUt = new JButton("Ajout utilisateur");
                 btnAjoutUt.setAlignmentX(Component.CENTER_ALIGNMENT);
-		btnAjoutUt.setEnabled(false);
+		
 		
 		btnAjoutProduit = new JButton("Ajout produit");
                 btnAjoutProduit.setAlignmentX(Component.CENTER_ALIGNMENT);
-		btnAjoutProduit.setEnabled(false);
 		
 		btnListeProduit = new JButton("liste produit");
                 btnListeProduit.setAlignmentX(Component.CENTER_ALIGNMENT);
-		btnListeProduit.setEnabled(false);
-	
-                
-              
+		
+                              
                 panGauche.add(Box.createVerticalGlue());
                 c.gridx = 0;
                 c.ipady = 10; // largeur suplémentaire
@@ -257,8 +254,7 @@ public class Vue implements ActionListener
                 panUtilisateur.add(espace);
                 
 		lblPrenom = new JLabel("prénom :");
-		lblPrenom.setEnabled(false);
-                panUtilisateur.add(lblPrenom);
+		panUtilisateur.add(lblPrenom);
 		 
 		lprenom = new JLabel("");
 		panUtilisateur.add(lprenom);
@@ -269,19 +265,15 @@ public class Vue implements ActionListener
                 JPanel panArticles = new JPanel();
                 panArticles.setLayout(new BoxLayout(panArticles, BoxLayout.X_AXIS));
 		lblProduit = new JLabel("Produit :");
-		lblProduit.setEnabled(false);
-                panArticles.add(lblProduit);
+		panArticles.add(lblProduit);
 		
-		comboBox_1 = new JComboBox();
-		comboBox_1.setEnabled(false);
-		panArticles.add(comboBox_1);
+		cmbArticlesFenPrinc = new JComboBox();
+		panArticles.add(cmbArticlesFenPrinc);
                 
 		CBBStock = new JComboBox();
-		CBBStock.setEnabled(false);
 		panArticles.add(CBBStock);
                 
-		btnOk_1 = new JButton("OK");
-		btnOk_1.setEnabled(false);
+		btnOk_1 = new JButton("OK");		
 		panArticles.add(btnOk_1);
                                 
                 panCentre.add(panArticles);
@@ -292,14 +284,12 @@ public class Vue implements ActionListener
                 panTotal.setLayout(new FlowLayout(FlowLayout.CENTER));
                 
 		lblTotal = new JLabel("Total :");
-		lblTotal.setEnabled(false);
 		lblValeurtotal = new JLabel("");
                 panTotal.add(lblTotal);
                 panTotal.add(lblValeurtotal);
 		
                 // Bouton valider en dessous
 		btnValider = new JButton("Valider");
-		btnValider.setEnabled(false);
 		btnValider.addActionListener(this);
 
                 /**
@@ -323,7 +313,6 @@ public class Vue implements ActionListener
 		//modifie la taille 
 		//scrollPane.setPreferredSize(new Dimension(430, 120));
 		panel_1.add(scrollPane);
-		supp.setVisible(false);
 		panel_1.add(supp);
 		supp.addActionListener(this);
                 //
@@ -337,6 +326,7 @@ public class Vue implements ActionListener
                 fond.add("Center", panCentre);
                 fond.add(BorderLayout.EAST, panGauche);
                 
+                activerDesactiverElementGraphPrincipaux(false);
                 fenPrinc.setContentPane(fond);
           
                 fenPrinc.doLayout();
@@ -355,7 +345,7 @@ public class Vue implements ActionListener
 		 * comme ceci un utilisateur ne peut prendre plus d'article
 		 * qu'il en existe dans la base
 		 */
-		comboBox_1.addItemListener(new ItemListener() 
+		cmbArticlesFenPrinc.addItemListener(new ItemListener() 
 		{
 			public void itemStateChanged(ItemEvent arg0)
 			{
@@ -394,12 +384,11 @@ public class Vue implements ActionListener
 		lblCatgorie = new JLabel("Cat\u00E9gorie :");
 		
 		CBCateg = new JComboBox();
-		CBCateg.addItem("Soutien gorge");
-		CBCateg.addItem("Porte jartelle");
-		CBCateg.addItem("maillot de bain");
-		CBCateg.addItem("lingerie de nuit");
-		CBCateg.addItem("ensemble sexy");
-		CBCateg.addItem("lingerie de mariage");
+		CBCateg.addItem("Boisson chaude");
+		CBCateg.addItem("viennoiserie");
+		CBCateg.addItem("Boisson gazeuse");
+		CBCateg.addItem("Boisson alcoolisée");
+		
 		
 		
 		lblNomArticle = new JLabel("Nom de l'article:");
@@ -441,6 +430,12 @@ public class Vue implements ActionListener
 				};
 				prod.AjoutProduit(tab);
 				fenAjoutProduit.dispose();
+                                
+                                art=prod.listeArticle();
+                                cmbArticlesFenPrinc.removeAllItems();
+					/*On ajoute les articles dans la comboBox dedier aux articles*/
+                                AjoutElementCombobox(art,1,cmbArticlesFenPrinc);
+                                
 			}
 		});
 		JButton btnAnnulerProduit = new JButton("Annuler");
@@ -458,25 +453,25 @@ public class Vue implements ActionListener
                 JPanel panGaucheAJart = new JPanel();
                 GridLayout layoutGauche = new GridLayout();
                 layoutGauche.setColumns(2);
-                layoutGauche.setRows(5);
-                
-                Filler espace = new Box.Filler(new Dimension(50, 5),new Dimension(50, 5),new Dimension(50, 5));
-                Filler espace1 = new Box.Filler(new Dimension(50, 5),new Dimension(50, 5),new Dimension(50, 5));
-                espace.setBackground(Color.red);
-                espace1.setBackground(Color.red);
-                               
+                layoutGauche.setRows(12);
+               
                 panGaucheAJart.setLayout(layoutGauche);
                 panGaucheAJart.add(lblCatgorie);
                 panGaucheAJart.add(CBCateg);
-                panGaucheAJart.add(espace);
-                panGaucheAJart.add(espace1);
+                panGaucheAJart.add(new Espace());
+                panGaucheAJart.add(new Espace());
                 panGaucheAJart.add(lblNomArticle);
                 panGaucheAJart.add(tfNomArt);
+                panGaucheAJart.add(new Espace());
+                panGaucheAJart.add(new Espace());
                 panGaucheAJart.add(lblPrixArticle);
                 panGaucheAJart.add(tfPrixArt);
+                panGaucheAJart.add(new Espace());
+                panGaucheAJart.add(new Espace());
                 panGaucheAJart.add(lblQuantit);
                 panGaucheAJart.add(tfQuantArt);
-                
+                panGaucheAJart.add(new Espace());
+                panGaucheAJart.add(new Espace());
                 
                 
                 JPanel panDroitAJart = new JPanel();
@@ -644,7 +639,7 @@ public class Vue implements ActionListener
 		for(int i=0;i<art.length;i++)
 		{
 			//Des que l'article dans la base correspond e l'article selectionne
-			if(comboBox_1.getSelectedItem().toString()==art[i][1])
+			if(cmbArticlesFenPrinc.getSelectedItem().toString()==art[i][1])
 			{
 				//on recupere le total de l'article selectionne avec la quantite
 				total=(Float.parseFloat(art[i][2])*(Float.parseFloat(CBBStock.getSelectedItem().toString())));
@@ -697,7 +692,7 @@ public class Vue implements ActionListener
 		//on reactualise le stock de l'article selectionne
 		for(int i=0;i<art.length;i++)
 		{
-			if(comboBox_1.getSelectedItem().toString()==art[i][1])
+			if(cmbArticlesFenPrinc.getSelectedItem().toString()==art[i][1])
 			{
 				art[i][3]= (Integer.parseInt(art[i][3])-quant)+"";
 			}
@@ -743,7 +738,7 @@ public class Vue implements ActionListener
 	 * @param id => la colonne
 	 * @param comboBox2
 	 */
-	public void AjoutComboboxtest(String [][]el, int id,JComboBox comboBox2)
+	public void AjoutElementCombobox(String [][]el, int id,JComboBox comboBox2)
 	{
 		for(int i=0;i < el.length;i++)
 		{
@@ -790,56 +785,68 @@ public class Vue implements ActionListener
 		//pour verifie si les champ sont bien rempli
 		boolean veriftext=true;
 		boolean verifchif=true;
+		boolean verifmail=true;
 		//tableau pour verifie que les champs textes
-		String []donneeText={tfAjMail.getText().toString(),
-						tfAjNom.getText().toString(),
-						tfAjPrenom.getText().toString(),
-						tpAjAdresse.getText().toString(),
-						tfAjVille.getText().toString(),
+		String []donneeText={tfAjMail.getText(),
+						tfAjNom.getText(),
+						tfAjPrenom.getText(),
+						tpAjAdresse.getText(),
+						tfAjVille.getText(),
+						};
+                String []donneeTextAVerifier={	tfAjNom.getText(),
+						tfAjPrenom.getText(),
+						tfAjVille.getText(),
 						};
 		//tableau pour verifie que les champs numerique
-		String []donneeChif={tfAjCp.getText().toString(),
-						tfAjPhone.getText().toString()};
+		String []donneeChif={tfAjCp.getText(),
+						tfAjPhone.getText()};
 		Pattern pattern = Pattern.compile("^[a-zA-Z ]+$");
 		Pattern pattern2 = Pattern.compile("^[0-9 ]+$");
+                Pattern patternEmail = Pattern.compile("^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)+$");
 		//je parcour tout le tableau ne contenant que les champs textes, je les verifie un par un
 		//si il y a une erreur on arrete tout
-				for(String str : donneeText)
+                
+ 			
+                                for(String str : donneeTextAVerifier)
 				{
 					
 					 if(!pattern.matcher(str).matches())
 					 {
 						 veriftext=false;
+                                                 JOptionPane.showMessageDialog(fenAjoutUt, "Le client n'a pas pu être inscrit\nVérifier nom, prénom et ville.","Erreur!",JOptionPane.ERROR_MESSAGE);
 					 	 break;
 					 }
 				}
-		//idem boucle precedent
+                                if (!patternEmail.matcher(tfAjMail.getText()).matches()) 
+                                {
+                                        verifmail=false;
+                                        JOptionPane.showMessageDialog(fenAjoutUt, "Le client n'a pas pu être inscrit\nVérifier votre adresse E-mail.","Erreur!",JOptionPane.ERROR_MESSAGE);
+                                }
+		//Boucle vérification des entrées chiffrées
 				for(String str : donneeChif)
 				{
 					 if(!pattern2.matcher(str).matches())
 					 {
-						 veriftext=false;
+						 verifchif=false;
+                                                 JOptionPane.showMessageDialog(fenAjoutUt, "Le client n'a pas pu être inscrit\nVérifier Code postal et numéro de téléphone.","Erreur!",JOptionPane.ERROR_MESSAGE);
 					 	 break;
 					 }
 				}
 				//je verifie si tout est ok, si c'est le cas alors j'enregistre le nouveau client
-				if(veriftext && verifchif)
+				if(veriftext && verifchif && verifmail)
 				{
 					if(tabuser.AjoutUser2(donneeText,donneeChif))
 					{
-						user=tabuser.ListUser();
+						user=tabuser.ListeUser();
 						comboBox.removeAllItems();
 						JOptionPane.showMessageDialog(fenAjoutUt, "Le client a bien été inscrit","inscription",JOptionPane.PLAIN_MESSAGE);
 						fenAjoutUt.dispose();
-						AjoutComboboxtest(user,2,comboBox);
+						AjoutElementCombobox(user,2,comboBox);
 					}else
 					{
-						JOptionPane.showMessageDialog(fenAjoutUt, "Le client n'a pas pu être inscrit","Erreur",JOptionPane.ERROR_MESSAGE);
+						
 					}
-				}else
-					{
-						JOptionPane.showMessageDialog(fenAjoutUt, "Tous les champs ne sont pas remplis correctement","Erreur",JOptionPane.ERROR_MESSAGE);
-					}
+				}
 	}
 	/**
 	 * Fonction regroupant les differents boutons/actions
@@ -856,7 +863,7 @@ public class Vue implements ActionListener
 			//on verifie si l'article n'est pas dejàs présent dans la jtable
 			while(i<table.getRowCount())
 			{
-				if(comboBox_1.getSelectedItem().toString()==table.getValueAt(i, 2))
+				if(cmbArticlesFenPrinc.getSelectedItem().toString()==table.getValueAt(i, 2))
 				{
 					exist=true;
 					//on modifie la quantite de l'article tant qu'il y en a en stock
@@ -880,22 +887,10 @@ public class Vue implements ActionListener
 		if(e.getSource()==btnOk)
 		{
 					/*On active les differents composants*/
-			comboBox_1.setEnabled(true);
-			lnom.setEnabled(true);
-			lprenom.setEnabled(true);
-			scrollPane.setVisible(true);
-			CBBStock.setEnabled(true);
-			btnOk_1.setEnabled(true);
-			lblPrenom.setEnabled(true);
-			lblNom_1.setEnabled(true);
-			lblProduit.setEnabled(true);
-			btnAjoutProduit.setEnabled(true);
-			btnAjoutUt.setEnabled(true);
-			supp.setVisible(true);
-			btnListeProduit.setEnabled(true);
-			comboBox_1.removeAllItems();
+			activerDesactiverElementGraphPrincipaux(true);
+			cmbArticlesFenPrinc.removeAllItems();
 					/*On ajoute les articles dans la comboBox dedier aux articles*/
-			AjoutComboboxtest(art,1,comboBox_1);
+			AjoutElementCombobox(art,1,cmbArticlesFenPrinc);
 					/*Variable qui definira le client qui est selectionne, pour connaitre le nombre de colonne
 					 * je me sers d'une methode appartenant e la classe User*/
 			userSelect=new String[tabuser.getnombreCol()];
@@ -963,14 +958,14 @@ public class Vue implements ActionListener
 			//si la connection fonctionne
 				if(connexion)
 				{
-					ldlEtatCon.setText("Connecte");
+					ldlEtatCon.setText("Connecté");
 					mntmDeconnexion.setEnabled(true);
 					mntmConnexion.setEnabled(false);
 					//on instance
 					tabuser = new Users(BDD.getCon());
 					prod=new Produit(BDD.getCon());
-					user=tabuser.ListUser();
-					art=prod.Article();
+					user=tabuser.ListeUser();
+					art=prod.listeArticle();
 					//on ajoute les utilisateurs dans la combobox
 					AjoutComboboxtest(user,2,3,comboBox);
 					lblNom.setEnabled(true);
@@ -983,7 +978,23 @@ public class Vue implements ActionListener
 		if(e.getSource()==mntmQuitter)
 		{
 			System.exit(0);
-		}else
+		}
+                else
+                if(e.getSource()==mntmDeconnexion)
+                {
+                        if(BDD.deconnecter())
+                        {
+                        ldlEtatCon.setText("Déconnecté");
+			mntmDeconnexion.setEnabled(false);
+			mntmConnexion.setEnabled(true);
+                        activerDesactiverElementGraphPrincipaux(false);
+                        lblNom.setEnabled(false);
+					comboBox.setEnabled(false);
+					btnOk.setEnabled(false);
+                        }
+                        
+                }
+                else
 			//Affiche l'inventaire des produit
 		if(e.getSource()==btnListeProduit)
 		{
@@ -1013,7 +1024,7 @@ public class Vue implements ActionListener
 				{
 					for(int i=0;i<art.length;i++)
 					{
-						if(comboBox_1.getSelectedItem()==art[i][1])
+						if(cmbArticlesFenPrinc.getSelectedItem()==art[i][1])
 						{
 							int id=Integer.parseInt(art[i][0]);
 							int valeur=Integer.parseInt(quantstock.getText())+prod.getstock(id);
@@ -1033,7 +1044,7 @@ public class Vue implements ActionListener
 			
                         contraintes.gridx = 1;
                         contraintes.gridy = 0;
-                        top.add(comboBox_1,contraintes);
+                        top.add(cmbArticlesFenPrinc,contraintes);
                         
                         contraintes.gridx = 2;
                         contraintes.gridy = 0;
@@ -1065,7 +1076,7 @@ public class Vue implements ActionListener
 			//si l'ajout est reussit
 			if(nouv.ajoutFacture(Integer.parseInt(userSelect[0]), totalFacture))
 			{
-				JOptionPane.showMessageDialog(fenAjoutUt, "La facture "+(nouv.getlastfact()+1)+" a bien été confirmée....patienter pour l'impression","Facture",JOptionPane.PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(fenAjoutUt, "La facture "+(nouv.getlastfact())+" a bien été confirmée....patienter pour l'impression","Facture",JOptionPane.PLAIN_MESSAGE);
 				//pour chaque article dans la jtable, on met e jour son stock
 				for(int i=0;i<table.getRowCount();i++)
 				{
@@ -1079,11 +1090,11 @@ public class Vue implements ActionListener
 				//on efface le tableau
 				((NewModel)table.getModel()).update(data);
 				//reactualise les article
-				art=this.prod.Article();
+				art=this.prod.listeArticle();
 				//data = new Object[0][0];
 				table.setVisible(false);
 				//pour continuer l'achat il faudra reselectionne un client
-				comboBox_1.setEnabled(false);
+				cmbArticlesFenPrinc.setEnabled(false);
 				supp.setEnabled(false);
 				lblValeurtotal.setText("");
 				testfen.dispose();
@@ -1100,12 +1111,32 @@ public class Vue implements ActionListener
 			}
 			
 	}
-	
+	public void activerDesactiverElementGraphPrincipaux(boolean etat)
+        {
+                        cmbArticlesFenPrinc.setEnabled(etat);
+			lnom.setEnabled(etat);
+			lprenom.setEnabled(etat);
+			scrollPane.setVisible(etat);
+			CBBStock.setEnabled(etat);
+			btnOk_1.setEnabled(etat);
+			lblPrenom.setEnabled(etat);
+			lblNom_1.setEnabled(etat);
+			lblProduit.setEnabled(etat);
+			btnAjoutProduit.setEnabled(etat);
+			btnAjoutUt.setEnabled(etat);
+			supp.setVisible(etat);
+			btnListeProduit.setEnabled(etat);
+                        btnValider.setEnabled(etat);
+        }
+                
+                
 	Facture nouv;
 	Fenetre testfen; 
 	JTextPane testpane;
 	int numfact=0;
 	
+        
+        
 	/**
 	 * Fonction qui affiche une page d'appercu de la facture
 	 */
@@ -1284,4 +1315,14 @@ public class Vue implements ActionListener
       paragraph.add(new Paragraph(" "));
     }
   }
+}
+
+
+class Espace extends JPanel
+{
+
+    public Espace() {
+        this.setBackground(Color.lightGray);
+    }
+
 }

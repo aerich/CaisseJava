@@ -71,7 +71,9 @@ import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 import java.util.*;
 import java.awt.Toolkit; 
+import java.awt.event.ComponentListener;
 import java.net.URL;
+import java.text.DecimalFormat;
 import javax.swing.plaf.SplitPaneUI;
 
 public class Vue implements ActionListener
@@ -88,12 +90,13 @@ public class Vue implements ActionListener
 	private JLabel lblNom;
 
 	private boolean connexion=false;
-		
+        private DecimalFormat df = new DecimalFormat("#######0.00");
 	
 	private JComboBox comboBox,cmbArticlesFenPrinc,CBBStock;
         private JComboBox CBCateg;
+        private JComboBox cmbListeProduit;
         
-	private JButton btnOk,btnOk_1,btnValider,btnAjoutUt,btnAjoutProduit,btValideTable,btnListeProduit;
+	private JButton btnOkClient,btnOkArticle,btnValider,btnAjoutUt,btnAjoutProduit,btValideTable,btnListeProduit;
         private JButton btnValiderAjProduit,btnAnnulerAjProduit,btnFermerListeProduit;
         
 	private Users tabuser;
@@ -110,27 +113,36 @@ public class Vue implements ActionListener
         private Fenetre fenAjoutUt,fenlist;
 	private Fenetre fenAjoutProduit;
         
-	private JTextField tfAjNom,tfAjPrenom,tfAjMail,tfAjCp,tfAjVille,tfAjPhone,quantstock;
+	private JTextField tfAjNom,tfAjPrenom,tfAjMail,tfAjCp,tfAjVille,tfAjPhone;
         private JTextField tfNomArt,tfPrixArt,tfQuantArt;
         
-	private JLabel lblAjNom,lblAjPrenom,lblAjMail,lblAjAdresse,lblAjCp,lblAjVille,lblAjphone,lblValeurtotal;
-        private JLabel lblCatgorie,lblNomArticle,lblPrixArticle,lblQuantit,lblDescription,lblTotal;
+	private JLabel lblValeurtotal;
+        private JLabel lblTotal;
         
 	private JTextPane tpAjAdresse;
         private JTextPane textPaneDescription;
         
-	private GroupLayout GL_CPFenAjout;
 	private JTable table;
+        private JTable table2;
 	private JScrollPane scrollPane;
 	
-	private JSpinner spQuantAjoutart;
 	private int max;
+        
+        float totalFacture=0;
+	int quantProduit=0;
+	float reduc=0;
+	float total=0;
+	private JMenuItem mntmQuitter;
+	private JMenu mnPrfrence;
+	private JMenuItem mntmConfig;
+	private JButton supp=new JButton("supprimer la dernière ligne");
 	
 	/**
 	 * Constructeur par defaut, affiche la page principal
 	 */
 	public Vue()
 	{
+                            
                 Dimension dimension = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
                 
                 
@@ -187,13 +199,13 @@ public class Vue implements ActionListener
 		pClient.setBorder(new LineBorder(new Color(0, 0, 0)));
 		lblNom = new JLabel("Nom :");
 		lblNom.setEnabled(false);
-                btnOk = new JButton("OK");
-		btnOk.setEnabled(false);
+                btnOkClient = new JButton("OK");
+		btnOkClient.setEnabled(false);
                 comboBox = new JComboBox();
 		comboBox.setEnabled(false);
 		pClient.add(lblNom);
 		pClient.add(comboBox);
-		pClient.add(btnOk);
+		pClient.add(btnOkClient);
                 
 		panel = new JPanel();
 		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -273,8 +285,8 @@ public class Vue implements ActionListener
 		CBBStock = new JComboBox();
 		panArticles.add(CBBStock);
                 
-		btnOk_1 = new JButton("OK");		
-		panArticles.add(btnOk_1);
+		btnOkArticle = new JButton("OK");		
+		panArticles.add(btnOkArticle);
                                 
                 panCentre.add(panArticles);
                 panCentre.add(new Box.Filler(new Dimension(0, 10),new Dimension(0, 10),new Dimension(0, 10)));
@@ -334,8 +346,8 @@ public class Vue implements ActionListener
 /////////////////////Action bouton / autre////////////
 //////////////////////////////////////////////////////
 		
-		btnOk_1.addActionListener(this);
-		btnOk.addActionListener(this);
+		btnOkArticle.addActionListener(this);
+		btnOkClient.addActionListener(this);
 		btnAjoutProduit.addActionListener(this);
 		btnAjoutUt.addActionListener(this);
 		btnListeProduit.addActionListener(this);
@@ -363,8 +375,12 @@ public class Vue implements ActionListener
 			}
 		});		
 		/////////////////////////////////////////////////////////
-		/////////////////////////////////////////////////////////
-		
+		// Ecouteur global
+                /////////////////////////////////////////////////////////
+		ActionsEcouteur ecouteur = new ActionsEcouteur(lblValeurtotal, btnValider);
+                
+                
+                
 	}
 	
 	/**
@@ -378,40 +394,28 @@ public class Vue implements ActionListener
 		CPFajoutProd = new JPanel();
 		CPFajoutProd.setBorder(new EmptyBorder(5, 5, 5, 5));
 		fenAjoutProduit.setContentPane(CPFajoutProd);
-                
-                
-		
-		lblCatgorie = new JLabel("Cat\u00E9gorie :");
-		
+                		
 		CBCateg = new JComboBox();
-		CBCateg.addItem("Boisson chaude");
+                Categorie cat = new Categorie(BDD.getCon());
+                
+                AjoutElementCombobox(cat.listeCategorie(), CBCateg);
+		/*CBCateg.addItem("Boisson chaude");
 		CBCateg.addItem("viennoiserie");
 		CBCateg.addItem("Boisson gazeuse");
-		CBCateg.addItem("Boisson alcoolisée");
+		CBCateg.addItem("Boisson alcoolisée");*/
 		
-		
-		
-		lblNomArticle = new JLabel("Nom de l'article:");
 		
 		tfNomArt = new JTextField();
 		tfNomArt.setColumns(10);
-		
-		lblPrixArticle = new JLabel("Prix de l'article :");
-		
+				
 		tfPrixArt = new JTextField();
 		tfPrixArt.setColumns(10);
-		
-		lblQuantit = new JLabel("Quantit\u00E9 :");
-		
+				
 		tfQuantArt = new JTextField();
 		tfQuantArt.setColumns(5);
-		
-		
-		lblDescription = new JLabel("Description");
-		
+				
 		textPaneDescription = new JTextPane();
-		
-		
+				
 		JButton btnValider = new JButton("Valider");
 		/**
 		 * Quand on valide la selection, je place les infos dans un tableau
@@ -456,19 +460,19 @@ public class Vue implements ActionListener
                 layoutGauche.setRows(12);
                
                 panGaucheAJart.setLayout(layoutGauche);
-                panGaucheAJart.add(lblCatgorie);
+                panGaucheAJart.add(new JLabel("Cat\u00E9gorie:"));
                 panGaucheAJart.add(CBCateg);
                 panGaucheAJart.add(new Espace());
                 panGaucheAJart.add(new Espace());
-                panGaucheAJart.add(lblNomArticle);
+                panGaucheAJart.add(new JLabel("Nom de l'article:"));
                 panGaucheAJart.add(tfNomArt);
                 panGaucheAJart.add(new Espace());
                 panGaucheAJart.add(new Espace());
-                panGaucheAJart.add(lblPrixArticle);
+                panGaucheAJart.add(new JLabel("Prix de l'article:"));
                 panGaucheAJart.add(tfPrixArt);
                 panGaucheAJart.add(new Espace());
                 panGaucheAJart.add(new Espace());
-                panGaucheAJart.add(lblQuantit);
+                panGaucheAJart.add(new JLabel("Quantit\u00E9:"));
                 panGaucheAJart.add(tfQuantArt);
                 panGaucheAJart.add(new Espace());
                 panGaucheAJart.add(new Espace());
@@ -477,7 +481,7 @@ public class Vue implements ActionListener
                 JPanel panDroitAJart = new JPanel();
                 BoxLayout layoutDroit = new BoxLayout(panDroitAJart,BoxLayout.Y_AXIS);
                 panDroitAJart.setLayout(layoutDroit);
-                panDroitAJart.add(lblDescription);
+                panDroitAJart.add(new JLabel("Description:"));
                 panDroitAJart.add(textPaneDescription);
                 FlowLayout layoutbtn = new FlowLayout(FlowLayout.RIGHT);
                 JPanel panBtn = new JPanel();
@@ -501,28 +505,16 @@ public class Vue implements ActionListener
 		CPFenAjout= new JPanel();
 		CPFenAjout.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
-		lblAjNom=new JLabel("Entrer nom:");
-		
 		tfAjNom = new JTextField();
 		tfAjNom.setColumns(10);
-		
-		lblAjPrenom = new JLabel("Entrer le pr\u00E9nom");
 		
 		tfAjPrenom = new JTextField();
 		tfAjPrenom.setColumns(10);
 		
-		lblAjMail = new JLabel("Entrer l'adresse mail:");
-		
 		tfAjMail = new JTextField();
 		tfAjMail.setColumns(10);
 		
-		lblAjAdresse = new JLabel("Adresse:");
-		
 		tpAjAdresse = new JTextPane();
-		
-		lblAjCp = new JLabel("Entrer le code Postal :");
-		
-		lblAjVille = new JLabel("Ville :");
 		
 		tfAjCp = new JTextField();
 		tfAjCp.setColumns(10);
@@ -530,7 +522,6 @@ public class Vue implements ActionListener
 		tfAjVille = new JTextField();
 		tfAjVille.setColumns(10);
 		
-		lblAjphone = new JLabel("T\u00E9l\u00E9phone :");
 		
 		tfAjPhone = new JTextField();
 		tfAjPhone.setColumns(10);
@@ -542,93 +533,68 @@ public class Vue implements ActionListener
 		btnAnnulerAjProduit.addActionListener(this);
                 
                
+                JPanel panAjUtil = new JPanel();
+                GridBagLayout layoutAjUtilisateur= new GridBagLayout();
+                GridBagConstraints c = new GridBagConstraints();
+                c.fill = GridBagConstraints.HORIZONTAL;
+                c.insets = new Insets(10,0,0,0); 
+                panAjUtil.setLayout(layoutAjUtilisateur);
+                c.gridx = 0;
+                c.gridy = 0;
+                panAjUtil.add(new JLabel("Nom:"),c);
+                c.gridx = 1;
+                panAjUtil.add(tfAjNom,c);
+                c.gridx = 2;
+                panAjUtil.add(new JLabel("Pr\u00E9nom:"),c);
+                c.gridx = 3;
+                panAjUtil.add(tfAjPrenom,c);
                 
-		GL_CPFenAjout = new GroupLayout(CPFenAjout);
-		GL_CPFenAjout.setHorizontalGroup(
-				GL_CPFenAjout.createParallelGroup(Alignment.LEADING)
-				.addGroup(GL_CPFenAjout.createSequentialGroup()
-					.addGroup(GL_CPFenAjout.createParallelGroup(Alignment.LEADING)
-						.addGroup(GL_CPFenAjout.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(GL_CPFenAjout.createParallelGroup(Alignment.LEADING)
-								.addGroup(GL_CPFenAjout.createParallelGroup(Alignment.LEADING, false)
-									.addGroup(GL_CPFenAjout.createSequentialGroup()
-										.addComponent(lblAjNom)
-										.addPreferredGap(ComponentPlacement.UNRELATED)
-										.addComponent(tfAjNom, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
-										.addGap(18)
-										.addComponent(lblAjPrenom, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(tfAjPrenom, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE))
-									.addComponent(lblAjAdresse)
-									.addGroup(GL_CPFenAjout.createSequentialGroup()
-										.addComponent(lblAjCp)
-										.addGap(2)
-										.addComponent(tfAjCp, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
-										.addGap(18)
-										.addComponent(lblAjVille)
-										.addPreferredGap(ComponentPlacement.UNRELATED)
-										.addComponent(tfAjVille, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-									.addComponent(tpAjAdresse))
-								.addGroup(GL_CPFenAjout.createSequentialGroup()
-									.addComponent(lblAjMail)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(tfAjMail, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE))
-								.addGroup(GL_CPFenAjout.createSequentialGroup()
-									.addComponent(lblAjphone)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(tfAjPhone, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE))))
-						.addGroup(GL_CPFenAjout.createSequentialGroup()
-							.addGap(122)
-							.addComponent(btnValiderAjProduit)
-							.addGap(18)
-							.addComponent(btnAnnulerAjProduit)))
-					.addContainerGap(17, Short.MAX_VALUE))
-		);
-		GL_CPFenAjout.setVerticalGroup(
-				GL_CPFenAjout.createParallelGroup(Alignment.LEADING)
-				.addGroup(GL_CPFenAjout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(GL_CPFenAjout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblAjNom)
-						.addComponent(tfAjNom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblAjPrenom)
-						.addComponent(tfAjPrenom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblAjAdresse)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpAjAdresse, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addGroup(GL_CPFenAjout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblAjCp)
-						.addComponent(tfAjCp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblAjVille)
-						.addComponent(tfAjVille, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(GL_CPFenAjout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblAjMail)
-						.addComponent(tfAjMail, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(GL_CPFenAjout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblAjphone)
-						.addComponent(tfAjPhone, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
-					.addGroup(GL_CPFenAjout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnValiderAjProduit)
-						.addComponent(btnAnnulerAjProduit)))
-		);
-		CPFenAjout.setLayout(GL_CPFenAjout);
-		fenAjoutUt.setContentPane(CPFenAjout);
+                c.gridy = 1;
+                c.gridx = 0;
+                panAjUtil.add(new JLabel("Adresse:"),c);              
+                c.gridy = 2;
+                c.gridwidth = 4;
+                c.ipady = 40;
+                panAjUtil.add(tpAjAdresse,c);
+                c.ipady = 0;
+                c.gridy = 3;
+                c.gridwidth = 1;
+                panAjUtil.add(new JLabel("Code Postal:"),c);
+                c.gridx = 1;
+                c.gridwidth = 3;
+                panAjUtil.add(tfAjCp,c);
+                c.gridy = 4;
+                c.gridx = 0;
+                c.gridwidth = 1;
+                panAjUtil.add(new JLabel("Ville:"),c);
+                c.gridx = 1;
+                c.gridwidth = 3;
+                panAjUtil.add(tfAjVille,c);
+                c.gridy = 5;
+                c.gridx = 0;
+                c.gridwidth = 1;
+                panAjUtil.add(new JLabel("E-mail:"),c);
+                c.gridx = 1;
+                c.gridwidth = 3;
+                panAjUtil.add(tfAjMail,c);
+                c.gridy = 6;
+                c.gridx = 0;
+                c.gridwidth = 1;
+                panAjUtil.add(new JLabel("T\u00E9l\u00E9phone:"),c);
+                c.gridx = 1;
+                c.gridwidth = 3;
+                panAjUtil.add(tfAjPhone,c);
+                c.gridy = 7;
+                c.gridx = 0;
+                c.gridwidth = 2;
+                panAjUtil.add(btnValiderAjProduit,c);
+                c.gridx = 2;
+                panAjUtil.add(btnAnnulerAjProduit,c);
+                                                            
+                fenAjoutUt.setContentPane(panAjUtil);
                 fenAjoutUt.setVisible(true);
 	}
-	float totalFacture=0;
-	int quantProduit=0;
-	float reduc=0;
-	float total=0;
-	private JMenuItem mntmQuitter;
-	private JMenu mnPrfrence;
-	private JMenuItem mntmConfig;
-	private JButton supp=new JButton("supprimer la dernière ligne");
+	
 	
 	/**
 	 * La fonction addligne permet quand l'utilisateur valide un article
@@ -639,7 +605,7 @@ public class Vue implements ActionListener
 		for(int i=0;i<art.length;i++)
 		{
 			//Des que l'article dans la base correspond e l'article selectionne
-			if(cmbArticlesFenPrinc.getSelectedItem().toString()==art[i][1])
+			if(cmbArticlesFenPrinc.getSelectedItem().toString().equals(art[i][1]))
 			{
 				//on recupere le total de l'article selectionne avec la quantite
 				total=(Float.parseFloat(art[i][2])*(Float.parseFloat(CBBStock.getSelectedItem().toString())));
@@ -661,8 +627,10 @@ public class Vue implements ActionListener
 				break;
 			}
 		}
-		//on affiche la facture
-		lblValeurtotal.setText(totalFacture+"");
+		//on catualise le total de la facture
+                
+                
+		lblValeurtotal.setText(df.format(totalFacture));
 		lblValeurtotal.repaint();
 		
 	}
@@ -684,7 +652,9 @@ public class Vue implements ActionListener
 		/*Reactualise le total*/
 		totalFacture+=(Float.parseFloat(table.getValueAt(ligne, 3).toString())*quant);
 		total+=(Float.parseFloat(table.getValueAt(ligne, 3).toString())*quant);
-		lblValeurtotal.setText(totalFacture+"");
+                
+		 
+		lblValeurtotal.setText(df.format(totalFacture));
 		lblValeurtotal.repaint();
 		
 		//reactualise le combobox des stock
@@ -708,23 +678,29 @@ public class Vue implements ActionListener
 	 */
 	public void enlevelgne(int ligne)
 	{
-		//Reactualise le total de la facture
-		totalFacture-=(Float.parseFloat(table.getValueAt(ligne, 3).toString()));
-		lblValeurtotal.setText(totalFacture+"");
+		//Réactualise le total de la facture
+                //
+		totalFacture-=(Float.parseFloat(table.getValueAt(ligne, 3).toString())*Float.parseFloat(table.getValueAt(ligne, 4).toString()));
+		               
+                if(totalFacture<=0)
+                {
+                    totalFacture=0.0f;
+                }
+                lblValeurtotal.setText(df.format(totalFacture));
 		lblValeurtotal.repaint();
 
-		//recupere l'id de l'article dans la jtable de la ligne supprime
+		//Récupère l'id de l'article dans la jtable de la ligne à retrancher ou à supprimer
 		String idart=(table.getValueAt(ligne, 1).toString());
-		//recupere la quantite d'un article contenu dans la jtable de la ligne supprime
+		//Récupère la quantité d'un article contenu dans la jtable de la ligne supprime
 		int quant=(Integer.parseInt(table.getValueAt(ligne, 4).toString()));
 		for(int i=0;i<art.length;i++)
 		{
-			//des que l'article de la base correspond e l'id de celui contenue dans la jtable
+			//Dès que l'article de la base correspond à l'id de celui contenu dans la jtable
 			//on le reactualise
-			if(art[i][0]==idart)
+			if(art[i][0].equals(idart))
 			{
 				int nouvstock=(Integer.parseInt(art[i][3])+quant);
-				art[i][3]=nouvstock+"";
+				art[i][3]=Integer.toString(nouvstock);
 				AjoutCCBStock(nouvstock,CBBStock);
 				break;
 			}
@@ -747,6 +723,18 @@ public class Vue implements ActionListener
 		//reactualise la fenetre
 		fenPrinc.validate();
 	}
+        
+        public void AjoutElementCombobox(String []el,JComboBox comboBox2)
+	{
+		for(int i=0;i < el.length;i++)
+		{
+			comboBox2.addItem(el[i]);
+		}
+		//reactualise la fenetre
+		fenPrinc.validate();
+	}
+        
+        
 	/**
 	 * idem que la fonction ci-dessus sauf que l'on ajoute 2 champs
 	 * @param el
@@ -780,26 +768,17 @@ public class Vue implements ActionListener
 	/**
 	 * fonction appele pour l'ajout d'un utilisateur
 	 */
-	public void ajoutUtilisateur()
+	public void ajoutUtilisateur(String strMail,String strNom, String strPrenom,String strAdresse,String strVille,String strCp,String strPhone)
 	{
 		//pour verifie si les champ sont bien rempli
 		boolean veriftext=true;
 		boolean verifchif=true;
 		boolean verifmail=true;
 		//tableau pour verifie que les champs textes
-		String []donneeText={tfAjMail.getText(),
-						tfAjNom.getText(),
-						tfAjPrenom.getText(),
-						tpAjAdresse.getText(),
-						tfAjVille.getText(),
-						};
-                String []donneeTextAVerifier={	tfAjNom.getText(),
-						tfAjPrenom.getText(),
-						tfAjVille.getText(),
-						};
+		String []donneeText={strMail,strNom,strPrenom,strAdresse,strVille,};
+                String []donneeTextAVerifier={strNom,strPrenom,strVille,};
 		//tableau pour verifie que les champs numerique
-		String []donneeChif={tfAjCp.getText(),
-						tfAjPhone.getText()};
+		String []donneeChif={strCp,strPhone};
 		Pattern pattern = Pattern.compile("^[a-zA-Z ]+$");
 		Pattern pattern2 = Pattern.compile("^[0-9 ]+$");
                 Pattern patternEmail = Pattern.compile("^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)+$");
@@ -817,7 +796,7 @@ public class Vue implements ActionListener
 					 	 break;
 					 }
 				}
-                                if (!patternEmail.matcher(tfAjMail.getText()).matches()) 
+                                if (!patternEmail.matcher(strMail).matches()) 
                                 {
                                         verifmail=false;
                                         JOptionPane.showMessageDialog(fenAjoutUt, "Le client n'a pas pu être inscrit\nVérifier votre adresse E-mail.","Erreur!",JOptionPane.ERROR_MESSAGE);
@@ -854,9 +833,9 @@ public class Vue implements ActionListener
 	public void actionPerformed(ActionEvent e) 
 	{
 		/*Quant on valide un article */
-		if(e.getSource()==btnOk_1)
+		if(e.getSource()==btnOkArticle)
 		{
-			btnValider.setEnabled(true);
+			
 			lblTotal.setEnabled(true);
 			boolean exist=false;
 			int i=0;
@@ -883,12 +862,14 @@ public class Vue implements ActionListener
 			
 
 		}else
-		/*Quant on clique sur le bouton qui valide le nom du client selectionné dans la comboBox*/
-		if(e.getSource()==btnOk)
+		/*Quant on clicque sur le bouton qui valide le nom du client selectionné dans la comboBox*/
+		if(e.getSource()==btnOkClient)
 		{
+                        
 					/*On active les differents composants*/
 			activerDesactiverElementGraphPrincipaux(true);
-			cmbArticlesFenPrinc.removeAllItems();
+			lblValeurtotal.setText("0,00");
+                        cmbArticlesFenPrinc.removeAllItems();
 					/*On ajoute les articles dans la comboBox dedier aux articles*/
 			AjoutElementCombobox(art,1,cmbArticlesFenPrinc);
 					/*Variable qui definira le client qui est selectionne, pour connaitre le nombre de colonne
@@ -899,11 +880,11 @@ public class Vue implements ActionListener
 			String verifnom = lnom.getText().toString()+" "+lprenom.getText().toString();
 			
 			/*je teste si on a change de client
-			 * Quand on change de client sans valider le pannier, on vide le Jtable*/
+			 * Quand on change de client sans valider le pannier, on vide la Jtable*/
 			if(userbox.compareTo(verifnom)<0)
 			{
 				((NewModel)table.getModel()).update(data);
-				lblValeurtotal.setText("");
+				lblValeurtotal.setText("0,00");
 			}	
 			/*Ici je place le nom choisie dans une seconde variable fixe*/
 			for(int i=0;i<user.length;i++)
@@ -947,7 +928,12 @@ public class Vue implements ActionListener
 			//quand on valide l'ajout d'un utilisateur
 		if(e.getSource()==btnValiderAjProduit)
 		{
-			this.ajoutUtilisateur();
+			this.ajoutUtilisateur(tfAjMail.getText(),
+						tfAjNom.getText(),
+						tfAjPrenom.getText(),
+						tpAjAdresse.getText(),
+						tfAjVille.getText(),tfAjCp.getText(),
+						tfAjPhone.getText());
 			
 		}else
 			//Quand on clique sur connexion
@@ -970,8 +956,8 @@ public class Vue implements ActionListener
 					AjoutComboboxtest(user,2,3,comboBox);
 					lblNom.setEnabled(true);
 					comboBox.setEnabled(true);
-					btnOk.setEnabled(true);
-					
+					btnOkClient.setEnabled(true);
+                                        
 				}
 		}else
 			//quand on clique sur quitter
@@ -990,7 +976,7 @@ public class Vue implements ActionListener
                         activerDesactiverElementGraphPrincipaux(false);
                         lblNom.setEnabled(false);
 					comboBox.setEnabled(false);
-					btnOk.setEnabled(false);
+					btnOkClient.setEnabled(false);
                         }
                         
                 }
@@ -998,6 +984,10 @@ public class Vue implements ActionListener
 			//Affiche l'inventaire des produit
 		if(e.getSource()==btnListeProduit)
 		{
+                        cmbListeProduit = new JComboBox();
+                        art=prod.listeArticle();
+                        AjoutElementCombobox(art, 1, cmbListeProduit);
+                        
 			btnFermerListeProduit = new JButton("Fermer");
                         btnFermerListeProduit.addActionListener(this);
 			fenlist=new Fenetre("Listing produit",600,600,fenPrinc,true);
@@ -1009,7 +999,7 @@ public class Vue implements ActionListener
 			String [][]listart=prod.Article("stock");
 			//on cree un nouvel jtabl ou l'on va placer tout les produits
 			NewModel model2=new NewModel(listart,new String[]{"id","Nom","prix","stock","categorie"});
-			JTable table2 = new JTable(model2);
+			table2 = new JTable(model2);
 		//	table2.setPreferredScrollableViewportSize(new Dimension(300, 150));
 			JScrollPane scrollPane2 = new JScrollPane(table2);
 			//scrollPane2.setPreferredSize(new Dimension(300, 150));
@@ -1020,15 +1010,17 @@ public class Vue implements ActionListener
 			//Quand on valide la nouvelle quantité, on met la base à jour
 			btnStockAjout.addActionListener(new ActionListener() 
 			{
+                @Override
 				public void actionPerformed(ActionEvent e) 
 				{
 					for(int i=0;i<art.length;i++)
 					{
-						if(cmbArticlesFenPrinc.getSelectedItem()==art[i][1])
+						if(cmbListeProduit.getSelectedItem()==art[i][1])
 						{
 							int id=Integer.parseInt(art[i][0]);
 							int valeur=Integer.parseInt(quantstock.getText())+prod.getstock(id);
 							prod.updatestock(id,valeur);
+                                                        table2.setModel(new NewModel(prod.Article("stock"),new String[]{"id","Nom","prix","stock","categorie"}));
 							break;
 						}
 					}
@@ -1044,7 +1036,7 @@ public class Vue implements ActionListener
 			
                         contraintes.gridx = 1;
                         contraintes.gridy = 0;
-                        top.add(cmbArticlesFenPrinc,contraintes);
+                        top.add(cmbListeProduit,contraintes);
                         
                         contraintes.gridx = 2;
                         contraintes.gridy = 0;
@@ -1093,10 +1085,10 @@ public class Vue implements ActionListener
 				art=this.prod.listeArticle();
 				//data = new Object[0][0];
 				table.setVisible(false);
-				//pour continuer l'achat il faudra reselectionne un client
+				//pour continuer l'achat il faudra resélectionner un client
 				cmbArticlesFenPrinc.setEnabled(false);
 				supp.setEnabled(false);
-				lblValeurtotal.setText("");
+				lblValeurtotal.setText("0,00");
 				testfen.dispose();
 				
 			}
@@ -1118,7 +1110,7 @@ public class Vue implements ActionListener
 			lprenom.setEnabled(etat);
 			scrollPane.setVisible(etat);
 			CBBStock.setEnabled(etat);
-			btnOk_1.setEnabled(etat);
+			btnOkArticle.setEnabled(etat);
 			lblPrenom.setEnabled(etat);
 			lblNom_1.setEnabled(etat);
 			lblProduit.setEnabled(etat);
@@ -1152,7 +1144,7 @@ public class Vue implements ActionListener
 		testpan.add(testpane);testpan.add(btValideTable);
 		testpane.setPreferredSize(new Dimension(450,400));
 		testpane.setEditable(false);
-		String facttable=new String("Id \t| Nom Produit \t| prix\t| quantite\t| total\n\n");
+		String facttable="Id \t| Nom Produit \t| prix\t| quantite\t| total\n\n";
 		nouv=new Facture(BDD.getCon());
 		numfact=nouv.getlastfact()+1;
 		for(int i=0;i<table.getRowCount();i++)
@@ -1161,10 +1153,10 @@ public class Vue implements ActionListener
 			{
 				if(j<table.getColumnCount()-1)
 				{
-					facttable+=""+table.getValueAt(i, j)+"\t| ";
+					facttable+=table.getValueAt(i, j).toString()+"\t| ";
 				}else
 					{
-						facttable+=""+table.getValueAt(i, j);
+						facttable+=table.getValueAt(i, j).toString();
 					}
 				
 			}facttable+="\n";
@@ -1176,7 +1168,10 @@ public class Vue implements ActionListener
 				"\nmail : "+userSelect[1]+
 				"\n\n\nAchat\n" +
 				""+facttable+
-				"\n\t\t Total : "+total+" euro");
+				"\n\t\t Total hors T.V.A. : "+df.format(totalFacture)+" €"+
+                                "\n\t\t T.V.A. (21%)      : "+df.format(totalFacture*0.21)+" €"+
+                                "\n\t\t "+
+                                "\n\t\t À payer           : "+df.format(totalFacture*1.21)+" €");
 		testfen.setVisible(true);
 	}
 	/**

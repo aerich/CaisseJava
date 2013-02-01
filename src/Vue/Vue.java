@@ -75,6 +75,7 @@ import java.awt.event.ComponentListener;
 import java.net.URL;
 import java.text.DecimalFormat;
 import javax.swing.plaf.SplitPaneUI;
+import javax.swing.text.JTextComponent;
 
 public class Vue implements ActionListener
 {
@@ -295,13 +296,17 @@ public class Vue implements ActionListener
                 
 		// Total et prix
                 JPanel panTotal = new JPanel();
-                panTotal.setLayout(new FlowLayout(FlowLayout.CENTER));
+                panTotal.setLayout(new FlowLayout(FlowLayout.RIGHT));
+                panClavierVirtuel panClavier = new panClavierVirtuel();
+                panTotal.add(panClavier);
+                panTotal.add(new Box.Filler(new Dimension(300, 0),new Dimension(300, 0),new Dimension(300, 0)));
                 
 		lblTotal = new JLabel("Total :");
 		lblValeurtotal = new JLabel("");
+                
                 panTotal.add(lblTotal);
                 panTotal.add(lblValeurtotal);
-		
+		panTotal.add(new Box.Filler(new Dimension(100, 0),new Dimension(100, 0),new Dimension(100, 0)));
                 // Bouton valider en dessous
 		btnValider = new JButton("Valider");
 		btnValider.addActionListener(this);
@@ -313,12 +318,6 @@ public class Vue implements ActionListener
 		JPanel panel_1 = new JPanel();
 		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
 		
-		
-		//titre du Tableau
-		String  title[] = {"Supprimer","id","Nom ", "Prix", "Quantité","total/euro"};
-		//instancie un nouveau modele
-		model=new NewModel(data,title);
-		//instancie la table avec les donnees et les titres
 		table = new JTable(model) {
 
                     public boolean isCellEditable(int row, int column)
@@ -330,8 +329,31 @@ public class Vue implements ActionListener
                         }
                         
                         return editable;
-                        }};
-                       
+                        }
+                public void changeSelection(
+                    int row, int column, boolean toggle, boolean extend)
+                {
+                    super.changeSelection(row, column, toggle, extend);
+
+                    if (editCellAt(row, column))
+                    {
+                        Component editor = getEditorComponent();
+                        editor.setBackground(Color.LIGHT_GRAY);
+                        ((JTextComponent) editor).selectAll();
+                        Bouton.editor=((JTextComponent) editor);
+                        editor.requestFocusInWindow();
+                        
+                    }
+                }
+                };
+		//titre du Tableau
+		String  title[] = {"Supprimer","id","Nom ", "Prix", "Quantité","total/euro"};
+		//instancie un nouveau modele
+		model=new NewModel(data,title);
+		//instancie la table avec les donnees et les titres
+		table.setModel(model);
+              
+                Bouton.setTarget(table);
                 
 		table.setPreferredScrollableViewportSize(new Dimension(439, 374));
 		//Le scrollpane nous permet de voir les titres
@@ -1333,6 +1355,11 @@ public class Vue implements ActionListener
       paragraph.add(new Paragraph(" "));
     }
   }
+         
+         public JTable getTableauPanier()
+         {
+             return table;
+         }
 }
 
 

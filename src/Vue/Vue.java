@@ -137,12 +137,14 @@ public class Vue implements ActionListener
 	private JMenuItem mntmConfig;
 	private JButton supp=new JButton("supprimer la dernière ligne");
 	
+        ActionsEcouteur ecouteur;
 	/**
 	 * Constructeur par defaut, affiche la page principal
 	 */
 	public Vue()
 	{
-                            
+               
+                
                 Dimension dimension = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
                 
                 
@@ -172,11 +174,11 @@ public class Vue implements ActionListener
 		mntmQuitter = new JMenuItem("Quitter");
 		mnFichier.add(mntmQuitter);
 		
-		mnPrfrence = new JMenu("Pr\u00E9f\u00E9rence");
+		/*mnPrfrence = new JMenu("Pr\u00E9f\u00E9rence");
 		menuBar.add(mnPrfrence);
 		
 		mntmConfig = new JMenuItem("Config");
-		mnPrfrence.add(mntmConfig);
+		mnPrfrence.add(mntmConfig);*/
 		
 		mntmConnexion.addActionListener(this);
 		mntmQuitter.addActionListener(this);
@@ -317,7 +319,20 @@ public class Vue implements ActionListener
 		//instancie un nouveau modele
 		model=new NewModel(data,title);
 		//instancie la table avec les donnees et les titres
-		table = new JTable(model);
+		table = new JTable(model) {
+
+                    public boolean isCellEditable(int row, int column)
+                    {
+                        boolean editable=false;
+                        if((row==this.getRowCount()-1)&&(column==4))
+                        {
+                            editable=true;
+                        }
+                        
+                        return editable;
+                        }};
+                       
+                
 		table.setPreferredScrollableViewportSize(new Dimension(439, 374));
 		//Le scrollpane nous permet de voir les titres
 		scrollPane = new JScrollPane(table);
@@ -377,7 +392,7 @@ public class Vue implements ActionListener
 		/////////////////////////////////////////////////////////
 		// Ecouteur global
                 /////////////////////////////////////////////////////////
-		ActionsEcouteur ecouteur = new ActionsEcouteur(lblValeurtotal, btnValider);
+		ecouteur = new ActionsEcouteur(lblValeurtotal, btnValider);
                 
                 
                 
@@ -990,6 +1005,7 @@ public class Vue implements ActionListener
                         
 			btnFermerListeProduit = new JButton("Fermer");
                         btnFermerListeProduit.addActionListener(this);
+                        
 			fenlist=new Fenetre("Listing produit",600,600,fenPrinc,true);
 			CPFenList = new JPanel();
 			CPFenList.setLayout(new BorderLayout(0,0));
@@ -1141,7 +1157,14 @@ public class Vue implements ActionListener
 		btValideTable=new JButton("Imprimer");
 		btValideTable.addActionListener(this);
 		
-		testpan.add(testpane);testpan.add(btValideTable);
+		testpan.add(testpane);
+                testpan.add(btValideTable);
+                
+                JButton btn = new JButton("Annuler");
+                ecouteur.setDispose(btn, testfen);
+                testpan.add(btn);
+                
+                
 		testpane.setPreferredSize(new Dimension(450,400));
 		testpane.setEditable(false);
 		String facttable="Id \t| Nom Produit \t| prix\t| quantite\t| total\n\n";

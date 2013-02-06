@@ -107,7 +107,7 @@ public class Vue implements ActionListener
 	private String userSelect[];
 	private String art[][];
 	private Object[][] data = new Object[0][0];
-	private NewModel model;
+	private jTableModele model;
         
 	private JFrame fenPrinc;
 	
@@ -312,7 +312,7 @@ public class Vue implements ActionListener
 		btnValider.addActionListener(this);
 
                 /**
-		 * Ici je cree le Jtable, qui contiendra les articles choisi par un client
+		 * Création de le Jtable adaptée quicontiendra les articles choisis par un client
 		 */
                 
 		JPanel panel_1 = new JPanel();
@@ -346,21 +346,20 @@ public class Vue implements ActionListener
                     }
                 }
                 };
-		//titre du Tableau
+		//Titre des colonnes du Tableau
 		String  title[] = {"Supprimer","id","Nom ", "Prix", "Quantité","total/euro"};
-		//instancie un nouveau modele
-		model=new NewModel(data,title);
-		//instancie la table avec les donnees et les titres
+		//Instancie un nouveau modèle
+		model=new jTableModele(data,title);
+		//Instancie la table avec les données et les titres
 		table.setModel(model);
               
                 Bouton.setTarget(table);
                 
 		table.setPreferredScrollableViewportSize(new Dimension(439, 374));
-		//Le scrollpane nous permet de voir les titres
+		//Le scroll-pane permet de naviguer
 		scrollPane = new JScrollPane(table);
 		scrollPane.setVisible(false);
-		//modifie la taille 
-		//scrollPane.setPreferredSize(new Dimension(430, 120));
+		
 		panel_1.add(scrollPane);
 		panel_1.add(supp);
 		supp.addActionListener(this);
@@ -379,22 +378,19 @@ public class Vue implements ActionListener
                 fenPrinc.setContentPane(fond);
           
                 fenPrinc.doLayout();
-//////////////////////////////////////////////////////
-/////////////////////Action bouton / autre////////////
-//////////////////////////////////////////////////////
+
+//     Actions évènements
+
 		
 		btnOkArticle.addActionListener(this);
 		btnOkClient.addActionListener(this);
 		btnAjoutProduit.addActionListener(this);
 		btnAjoutUt.addActionListener(this);
 		btnListeProduit.addActionListener(this);
-		/**
-		 * Des que l'on selectionne un autre article dans le combobox
-		 * on reactualise le stock dans la seconde combobox
-		 * comme ceci un utilisateur ne peut prendre plus d'article
-		 * qu'il en existe dans la base
-		 */
-		cmbArticlesFenPrinc.addItemListener(new ItemListener() 
+		
+                // Le stock est réactualisé au changement de sélection 
+		
+                cmbArticlesFenPrinc.addItemListener(new ItemListener() 
 		{
 			public void itemStateChanged(ItemEvent arg0)
 			{
@@ -411,18 +407,18 @@ public class Vue implements ActionListener
 				
 			}
 		});		
-		/////////////////////////////////////////////////////////
+		
 		// Ecouteur global
-                /////////////////////////////////////////////////////////
+                
 		ecouteur = new ActionsEcouteur(lblValeurtotal, btnValider);
                 
                 
                 
 	}
 	
-	/**
-	 * Cree la fenetre qui vas permettre l'ajout d'un produit
-	 */
+	
+	 // Création de la fenêtre d'ajout des produits
+	 
 	public void initAjoutProduit()
 	{
 		
@@ -435,13 +431,9 @@ public class Vue implements ActionListener
 		CBCateg = new JComboBox();
                 Categorie cat = new Categorie(BDD.getCon());
                 
+                // Ajoute les noms des catégories
                 AjoutElementCombobox(cat.listeCategorie(), CBCateg);
-		/*CBCateg.addItem("Boisson chaude");
-		CBCateg.addItem("viennoiserie");
-		CBCateg.addItem("Boisson gazeuse");
-		CBCateg.addItem("Boisson alcoolisée");*/
-		
-		
+				
 		tfNomArt = new JTextField();
 		tfNomArt.setColumns(10);
 				
@@ -454,10 +446,11 @@ public class Vue implements ActionListener
 		textPaneDescription = new JTextPane();
 				
 		JButton btnValider = new JButton("Valider");
-		/**
-		 * Quand on valide la selection, je place les infos dans un tableau
-		 * puis j'envoie le tableau e la methode "ajoutProduit"
-		 * qui va ajouter l'article dans la base de donnee
+		
+                /**
+		 * À la validation de la fenetre ajout-produit, les infos 
+		 * des champs sont mises dans un tableau envoyé à la méthode "ajoutProduit"
+		 * qui l'enverra dans la base de données
 		 */
 		btnValider.addActionListener(new ActionListener() 
 		{
@@ -473,15 +466,17 @@ public class Vue implements ActionListener
 				fenAjoutProduit.dispose();
                                 
                                 art=prod.listeArticle();
+                                
+                                // Mise à jour de la combobox principale qui contient les articles
                                 cmbArticlesFenPrinc.removeAllItems();
-					/*On ajoute les articles dans la comboBox dedier aux articles*/
+				
                                 AjoutElementCombobox(art,1,cmbArticlesFenPrinc);
                                 
 			}
 		});
 		JButton btnAnnulerProduit = new JButton("Annuler");
 		/**
-		 * quand on clique sur annuler on quitte tout simplement la fenetre
+		 * Fermeture de la fenêtre ajout produit avec bouton annuler
 		 */
 		btnAnnulerProduit.addActionListener(new ActionListener() 
 		{
@@ -535,7 +530,7 @@ public class Vue implements ActionListener
 
 	
 	/**
-	 * fonction qui cree la fenetre pour ajouter un utilisateur
+	 * Fonction créant la fenêtre "ajouter utilisateur"
 	 */
 	public void initfenAjoutUt()
 	{
@@ -634,14 +629,14 @@ public class Vue implements ActionListener
 	
 	
 	/**
-	 * La fonction addligne permet quand l'utilisateur valide un article
-	 * de l'ajouter dans le jtable.
+	 * Fonction addligne: quand l'utilisateur valide un article -> ajout à la jtable articles.
+	 * 
 	 */
 	public void addligne()
 	{
 		for(int i=0;i<art.length;i++)
 		{
-			//Des que l'article dans la base correspond e l'article selectionne
+			//Dès que l'article de la base de données correspond à l'article sélectionné
 			if(cmbArticlesFenPrinc.getSelectedItem().toString().equals(art[i][1]))
 			{
 				//on recupere le total de l'article selectionne avec la quantite
@@ -653,7 +648,7 @@ public class Vue implements ActionListener
 				//on place les donnees dans un Object
 				Object[] donnee = new Object[]{"supp",art[i][0],art[i][1], art[i][2], CBBStock.getSelectedItem(), total};
 				//on ajoute la ligne au jtable
-				((NewModel)table.getModel()).addRow(donnee);
+				((jTableModele)table.getModel()).addRow(donnee);
 				//Apres on actualise le stock de l'article
 				 art[i][3]= (Integer.parseInt(art[i][3])-quant)+"";
 				 AjoutCCBStock(Integer.parseInt(art[i][3]),CBBStock);
@@ -664,7 +659,7 @@ public class Vue implements ActionListener
 				break;
 			}
 		}
-		//on catualise le total de la facture
+		//Atualisation du total de la facture
                 
                 
 		lblValeurtotal.setText(df.format(totalFacture));
@@ -672,21 +667,22 @@ public class Vue implements ActionListener
 		
 	}
 	/**
-	 * fonction qui modifie une ligne du jtable si un article est deja present dans le jtable
+	 * Fonction servant à modifier une ligne de la jtable Article quand article est déjà présent
+         * dans la jtable Article
 	 * @param ligne
 	 */
 	public void modifligne(int ligne)
 	{
-		//on recupere la quantite (stock) contenu dans le jtable
+		//Récupération de la quantité du stock contenu dans la Jtable
 		int quantTable=Integer.parseInt(table.getValueAt(ligne, 4).toString());
-		//on recupere la quantite que le client souhaite rajouter
+		//Récupération de la quantite que le client souhaite prendre
 		int quant=Integer.parseInt(CBBStock.getSelectedItem().toString());
-		//on additionne le tout
+		//Addition des quantités
 		int nouvquant=quantTable+quant;
-		//contient la nouvelle quantite du stock disponnible pour la combobox
+		//Nouvelle quantite du stock disponnible pour combobox
 		int nouvquantCBOX=CBBStock.getItemCount()-quant;
 		
-		/*Reactualise le total*/
+		// Réactualisation du total
 		totalFacture+=(Float.parseFloat(table.getValueAt(ligne, 3).toString())*quant);
 		total+=(Float.parseFloat(table.getValueAt(ligne, 3).toString())*quant);
                 
@@ -694,7 +690,7 @@ public class Vue implements ActionListener
 		lblValeurtotal.setText(df.format(totalFacture));
 		lblValeurtotal.repaint();
 		
-		//reactualise le combobox des stock
+		//Réactualisation de la combobox du stock
 		AjoutCCBStock(nouvquantCBOX,CBBStock);
 		//on reactualise le stock de l'article selectionne
 		for(int i=0;i<art.length;i++)
@@ -704,18 +700,18 @@ public class Vue implements ActionListener
 				art[i][3]= (Integer.parseInt(art[i][3])-quant)+"";
 			}
 		}
-		//on modifie les champ dans la jtable 5=>total et 4 => stock
-		((NewModel)table.getModel()).SetValueAt(ligne, 5,(Object)(total));
-		((NewModel)table.getModel()).SetValueAt(ligne, 4,(Object)(nouvquant));
+		//Modification des champs dans la Jtable [5]->total;  [4]->stock
+		((jTableModele)table.getModel()).SetValueAt(ligne, 5,(Object)(total));
+		((jTableModele)table.getModel()).SetValueAt(ligne, 4,(Object)(nouvquant));
 	}
 	/**
-	 * fonctione qui supprime la derniere ligne ajoute.
-	 * une fois la ligne supprimee, il faut reactualise les stocks
+	 * Fonction supprimant la dernière ligne ajoutée.
+	 * Une fois la ligne supprimée, les stocks sont réactualisés
 	 * @param ligne
 	 */
 	public void enlevelgne(int ligne)
 	{
-		//Réactualise le total de la facture
+		//Réactualisation du total de la facture
                 //
 		totalFacture-=(Float.parseFloat(table.getValueAt(ligne, 3).toString())*Float.parseFloat(table.getValueAt(ligne, 4).toString()));
 		               
@@ -728,12 +724,12 @@ public class Vue implements ActionListener
 
 		//Récupère l'id de l'article dans la jtable de la ligne à retrancher ou à supprimer
 		String idart=(table.getValueAt(ligne, 1).toString());
-		//Récupère la quantité d'un article contenu dans la jtable de la ligne supprime
+		//Récupère la quantité d'un article contenu dans la Jtable de la ligne supprimée
 		int quant=(Integer.parseInt(table.getValueAt(ligne, 4).toString()));
 		for(int i=0;i<art.length;i++)
 		{
 			//Dès que l'article de la base correspond à l'id de celui contenu dans la jtable
-			//on le reactualise
+			//cette dernière est réactualisée
 			if(art[i][0].equals(idart))
 			{
 				int nouvstock=(Integer.parseInt(art[i][3])+quant);
@@ -742,20 +738,20 @@ public class Vue implements ActionListener
 				break;
 			}
 		}
-		//on supprime enfin la ligne
-		((NewModel)table.getModel()).removeRow(table.getRowCount()-1);
+		//La ligne est supprimée
+		((jTableModele)table.getModel()).removeRow(table.getRowCount()-1);
 	}
 	/**
 	 * Fonction qui remplie les combobox
-	 * @param el => la variable (art ou user)
+	 * @param el => la variable (art ou user) --> article ou utilisateur
 	 * @param id => la colonne
-	 * @param comboBox2
+	 * @param comboAModifier
 	 */
-	public void AjoutElementCombobox(String [][]el, int id,JComboBox comboBox2)
+	public void AjoutElementCombobox(String [][]el, int id,JComboBox comboAModifier)
 	{
 		for(int i=0;i < el.length;i++)
 		{
-			comboBox2.addItem(el[i][id]);
+			comboAModifier.addItem(el[i][id]);
 		}
 		//reactualise la fenetre
 		fenPrinc.validate();
@@ -773,54 +769,54 @@ public class Vue implements ActionListener
         
         
 	/**
-	 * idem que la fonction ci-dessus sauf que l'on ajoute 2 champs
+	 * Fonction qui remplie les combobox à partir d'un tableau à double entrées
 	 * @param el
 	 * @param id
 	 * @param champ
-	 * @param comboBox2
+	 * @param comboAModifier
 	 */
-	public void AjoutComboboxtest(String [][]el, int id,int champ,JComboBox comboBox2)
+	public void AjoutComboboxtest(String [][]el, int id,int champ,JComboBox comboAModifier)
 	{
 		for(int i=0;i < el.length;i++)
 		{
-			comboBox2.addItem(el[i][id]+" "+el[i][champ]);
+			comboAModifier.addItem(el[i][id]+" "+el[i][champ]);
 		}
 		fenPrinc.validate();
 	}
 	/**
-	 * idem mais pour les stocks
+	 * Fonction qui remplie les combobox stocks
 	 * @param Stock
-	 * @param comboBox2
+	 * @param comboAModifier
 	 */
-	public void AjoutCCBStock(int Stock,JComboBox comboBox2)
+	public void AjoutCCBStock(int Stock,JComboBox comboAModifier)
 	{
-		comboBox2.removeAllItems();
+		comboAModifier.removeAllItems();
 		for(int i=0;i < Stock;i++)
 		{
-			comboBox2.addItem(i+1);
+			comboAModifier.addItem(i+1);
 		}
 		fenPrinc.validate();
 	}
 	
 	/**
-	 * fonction appele pour l'ajout d'un utilisateur
+	 * Fonction ajoutant un utilisateur
 	 */
 	public void ajoutUtilisateur(String strMail,String strNom, String strPrenom,String strAdresse,String strVille,String strCp,String strPhone)
 	{
-		//pour verifie si les champ sont bien rempli
+		//Verification des champs remplis
 		boolean veriftext=true;
 		boolean verifchif=true;
 		boolean verifmail=true;
-		//tableau pour verifie que les champs textes
+		//Tableau de verification des champs textes
 		String []donneeText={strMail,strNom,strPrenom,strAdresse,strVille,};
                 String []donneeTextAVerifier={strNom,strPrenom,strVille,};
-		//tableau pour verifie que les champs numerique
+		//Tableau de verification des champs numeriques
 		String []donneeChif={strCp,strPhone};
 		Pattern pattern = Pattern.compile("^[a-zA-Z ]+$");
 		Pattern pattern2 = Pattern.compile("^[0-9 ]+$");
                 Pattern patternEmail = Pattern.compile("^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)+$");
-		//je parcour tout le tableau ne contenant que les champs textes, je les verifie un par un
-		//si il y a une erreur on arrete tout
+		//Parcours des éléments du tableau des champs textes
+		//Si erreur sortie boucle
                 
  			
                                 for(String str : donneeTextAVerifier)
@@ -848,7 +844,7 @@ public class Vue implements ActionListener
 					 	 break;
 					 }
 				}
-				//je verifie si tout est ok, si c'est le cas alors j'enregistre le nouveau client
+                //Verification si les conditions sont remplies. Si oui, enregistrement du nouveau client
 				if(veriftext && verifchif && verifmail)
 				{
 					if(tabuser.AjoutUser2(donneeText,donneeChif))
@@ -869,20 +865,20 @@ public class Vue implements ActionListener
 	 */
 	public void actionPerformed(ActionEvent e) 
 	{
-		/*Quant on valide un article */
+		//Validation d'un article 
 		if(e.getSource()==btnOkArticle)
 		{
 			
 			lblTotal.setEnabled(true);
 			boolean exist=false;
 			int i=0;
-			//on verifie si l'article n'est pas dejàs présent dans la jtable
+			// Vérification de la présence de l'articlen dans la jtable
 			while(i<table.getRowCount())
 			{
 				if(cmbArticlesFenPrinc.getSelectedItem().toString()==table.getValueAt(i, 2))
 				{
 					exist=true;
-					//on modifie la quantite de l'article tant qu'il y en a en stock
+					// Modification de la quantité de l'article tant qu'il y en a en stock
 					if(CBBStock.getItemCount()>0)
 						modifligne(i);
 					else
@@ -891,7 +887,7 @@ public class Vue implements ActionListener
 				}
 				i++;
 			}
-			//si l'article n'existe pas le rajoute simplement
+			// Ajout de l'article non présent
 			if(!exist)
 			{
 				this.addligne();
@@ -899,31 +895,31 @@ public class Vue implements ActionListener
 			
 
 		}else
-		/*Quant on clicque sur le bouton qui valide le nom du client selectionné dans la comboBox*/
+		// Action bouton validation sélection client
 		if(e.getSource()==btnOkClient)
 		{
                         
-					/*On active les differents composants*/
+			// Activation des differents composants
 			activerDesactiverElementGraphPrincipaux(true);
 			lblValeurtotal.setText("0,00");
                         cmbArticlesFenPrinc.removeAllItems();
-					/*On ajoute les articles dans la comboBox dedier aux articles*/
+			// Ajout des articles dans la comboBox dediée aux articles
 			AjoutElementCombobox(art,1,cmbArticlesFenPrinc);
-					/*Variable qui definira le client qui est selectionne, pour connaitre le nombre de colonne
-					 * je me sers d'une methode appartenant e la classe User*/
+			// Variable définissant le client sélectionné
+                        // Afin de connaître le nombre de colonne: méthode de la classe User
 			userSelect=new String[tabuser.getnombreCol()];
-			//stocke le nom prenom selectionne
+			// Stockage du nom prenom sélectionné
 			String userbox=comboBox.getSelectedItem().toString();
 			String verifnom = lnom.getText().toString()+" "+lprenom.getText().toString();
 			
-			/*je teste si on a change de client
-			 * Quand on change de client sans valider le pannier, on vide la Jtable*/
+			/*Testte changement client
+			 * Changement de client sans valider le pannier --> Jtable vidée*/
 			if(userbox.compareTo(verifnom)<0)
 			{
-				((NewModel)table.getModel()).update(data);
+				((jTableModele)table.getModel()).update(data);
 				lblValeurtotal.setText("0,00");
 			}	
-			/*Ici je place le nom choisie dans une seconde variable fixe*/
+			// Nom choisi dans une seconde variable
 			for(int i=0;i<user.length;i++)
 			{
 				String nom =user[i][2]+" "+user[i][3];
@@ -943,12 +939,12 @@ public class Vue implements ActionListener
 			
 			
 		}else
-			//quant on clique sur le bouton ajout produit
+			//Clique sur bouton ajout produit
 		if(e.getSource()==btnAjoutProduit)
 		{
 			initAjoutProduit();
 		}else
-			//quant on clique sur le bouton ajout utilisateur
+			//Clique sur  bouton ajout utilisateur
 		if(e.getSource()==btnAjoutUt)
 		{
 			fenAjoutUt=new Fenetre("Ajout utilisateur",461,339,fenPrinc,true);
@@ -962,7 +958,7 @@ public class Vue implements ActionListener
 		{
 			fenlist.dispose();
 		}else
-			//quand on valide l'ajout d'un utilisateur
+		//Clique sur valider l'ajout d'un utilisateur
 		if(e.getSource()==btnValiderAjProduit)
 		{
 			this.ajoutUtilisateur(tfAjMail.getText(),
@@ -973,23 +969,23 @@ public class Vue implements ActionListener
 						tfAjPhone.getText());
 			
 		}else
-			//Quand on clique sur connexion
+		//Clique sur bouton connexion
 		if(e.getSource()==mntmConnexion)
 		{
 			BDD=new Connexion("localhost:3306/caisse","root","");
 			connexion=BDD.getEtat();
-			//si la connection fonctionne
+			//Connection réussie
 				if(connexion)
 				{
 					ldlEtatCon.setText("Connecté");
 					mntmDeconnexion.setEnabled(true);
 					mntmConnexion.setEnabled(false);
-					//on instance
+					//Instanciation
 					tabuser = new Users(BDD.getCon());
 					prod=new Produit(BDD.getCon());
 					user=tabuser.ListeUser();
 					art=prod.listeArticle();
-					//on ajoute les utilisateurs dans la combobox
+					//Ajout utilisateurs dans combobox
 					AjoutComboboxtest(user,2,3,comboBox);
 					lblNom.setEnabled(true);
 					comboBox.setEnabled(true);
@@ -997,7 +993,7 @@ public class Vue implements ActionListener
                                         
 				}
 		}else
-			//quand on clique sur quitter
+		//Clique sur bouton quitter
 		if(e.getSource()==mntmQuitter)
 		{
 			System.exit(0);
@@ -1018,7 +1014,7 @@ public class Vue implements ActionListener
                         
                 }
                 else
-			//Affiche l'inventaire des produit
+		//Affichage de l'inventaire des produits
 		if(e.getSource()==btnListeProduit)
 		{
                         cmbListeProduit = new JComboBox();
@@ -1033,19 +1029,19 @@ public class Vue implements ActionListener
 			CPFenList.setLayout(new BorderLayout(0,0));
 			final JTextField quantstock = new JTextField();
 			quantstock.setColumns(5);
-			//produit classe par stock
+			// Classement produits par stock
 			String [][]listart=prod.Article("stock");
-			//on cree un nouvel jtabl ou l'on va placer tout les produits
-			NewModel model2=new NewModel(listart,new String[]{"id","Nom","prix","stock","categorie"});
+			//Nouvelle jtable pour y placer tous les produits
+			jTableModele model2=new jTableModele(listart,new String[]{"id","Nom","prix","stock","categorie"});
 			table2 = new JTable(model2);
-		//	table2.setPreferredScrollableViewportSize(new Dimension(300, 150));
+		
 			JScrollPane scrollPane2 = new JScrollPane(table2);
-			//scrollPane2.setPreferredSize(new Dimension(300, 150));
+			
 			JLabel texte = new JLabel("Augmenter la quantité:");
 			JPanel top = new JPanel();
                         top.setLayout(new GridBagLayout());
 			JButton btnStockAjout = new JButton("Ok"); 
-			//Quand on valide la nouvelle quantité, on met la base à jour
+			//Quand validation nouvelle quantité -> mise à jour DB
 			btnStockAjout.addActionListener(new ActionListener() 
 			{
                 @Override
@@ -1058,7 +1054,7 @@ public class Vue implements ActionListener
 							int id=Integer.parseInt(art[i][0]);
 							int valeur=Integer.parseInt(quantstock.getText())+prod.getstock(id);
 							prod.updatestock(id,valeur);
-                                                        table2.setModel(new NewModel(prod.Article("stock"),new String[]{"id","Nom","prix","stock","categorie"}));
+                                                        table2.setModel(new jTableModele(prod.Article("stock"),new String[]{"id","Nom","prix","stock","categorie"}));
 							break;
 						}
 					}
@@ -1093,21 +1089,21 @@ public class Vue implements ActionListener
 			
 			
 		}else
-			//quand on valide l'achat on peut avoir un petit appercu 
+                //Quand Validation achat -> Aperçu 
 		if(e.getSource()==btnValider)
-		{//fonction appercu d'achat
+		{//Fonction aperçu achat
                     System.out.println("Facture Demandée!");
 			crfact();
 		  	
 		}else
-			//quand on valide le panier pour de bon, on met la base de donnee e jour
+		//Validation panier final -> base de données mise à jour
 		if(e.getSource()==btValideTable)
 		{
-			//si l'ajout est reussit
+			//Si ajout reussi
 			if(nouv.ajoutFacture(Integer.parseInt(userSelect[0]), totalFacture))
 			{
 				JOptionPane.showMessageDialog(fenAjoutUt, "La facture "+(nouv.getlastfact())+" a bien été confirmée....patienter pour l'impression","Facture",JOptionPane.PLAIN_MESSAGE);
-				//pour chaque article dans la jtable, on met e jour son stock
+				//Pour chaque article de la jtable -> mise à jour du stock correspondant
 				for(int i=0;i<table.getRowCount();i++)
 				{
 					int idart=Integer.parseInt(table.getValueAt(i, 1).toString());
@@ -1115,15 +1111,15 @@ public class Vue implements ActionListener
 					int nouvStock=(prod.getstock(idart))-quanttab;
 					this.prod.updatestock(idart, nouvStock);
 				}
-				//on imprime la facture en pdf
+				//Impression facture PDF
 				this.print();
-				//on efface le tableau
-				((NewModel)table.getModel()).update(data);
-				//reactualise les article
+				//Effacer le tableau
+				((jTableModele)table.getModel()).update(data);
+				//Réactualisation des articles
 				art=this.prod.listeArticle();
-				//data = new Object[0][0];
+				
 				table.setVisible(false);
-				//pour continuer l'achat il faudra resélectionner un client
+				//Pour continuer des achats il faudra resélectionner un client
 				cmbArticlesFenPrinc.setEnabled(false);
 				supp.setEnabled(false);
 				lblValeurtotal.setText("0,00");
@@ -1131,7 +1127,7 @@ public class Vue implements ActionListener
 				
 			}
 		}else
-			//quand on supprime une ligne
+			// Quand suppression ligne
 			if(e.getSource()==supp)
 			{
                             if(table.getRowCount()>0)
@@ -1168,7 +1164,7 @@ public class Vue implements ActionListener
         
         
 	/**
-	 * Fonction qui affiche une page d'appercu de la facture
+	 * Fonction affichant une page d'aperçu de la facture
 	 */
 	public void crfact()
 	{
@@ -1314,34 +1310,9 @@ public class Vue implements ActionListener
     
     document.add(tableau);
     
-    
-    
-    
-    
-              
-            
-              
-	      /*PdfContentByte cb = writer.getDirectContent();
-	      
-	      cb.saveState();
-	      Graphics2D g2 = cb.createGraphicsShapes(500, 500);
-
-	      Shape oldClip = g2.getClip();
-	      g2.clipRect(0, 0, 500, 500);
-	      
-	      document.add(new Paragraph("\n\nIdentite\n" +
-					"Nom : "+userSelect[2]+"\tPrenom : "+userSelect[3]+
-					"\nmail : "+userSelect[1]+""));
-              
-	      //testpane.print();
-	      table.print(g2);
-	      g2.setClip(oldClip);
-
-	      g2.dispose();
-	      cb.restoreState();
-	      document.add(new Paragraph("Le montant total  est de "+total+" euro "));*/
+    	      
 		  document.newPage();
-	      //////////////
+	      
 	      
 	    } catch (Exception e) {
 	      System.err.println(e.getMessage());
